@@ -6,7 +6,7 @@ const rs = (n) => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFracti
 const usd = (n) => "$" + Number(n || 0).toFixed(2);
 const when = (iso) => (iso || "").slice(0, 16).replace("T", " ");
 
-let LANG = localStorage.getItem("lang") || "en";
+const LANG = "en";                                   // UI is English-only; the mic still understands Hindi speech
 let MIC_LANG = localStorage.getItem("micLang") || "hi-IN";
 let STATE = null;
 let COLLECT = null;
@@ -33,7 +33,7 @@ const T = {
     noMic: "Voice needs Chrome on Android or desktop. You can type instead.", payment: "Payment received",
     priceUpdate: "Update prices", stockAdd: "Add stock", aiAnswer: "Answer", noItems: "No items recognised.", save: "Save",
     trend: "Last 14 days", trendSub: "sales · udhaar given · collected", history: "Past runs",
-    collectTitle: "AI collections agent · वसूली",
+    collectTitle: "AI collections agent",
     collectHelp: "Reads every open khata, decides who to nudge today, writes a polite message, and uses PayPal invoices and reminders. Nothing is sent until you approve.",
     collectNote: "PayPal reminder emails use PayPal's standard text. The AI message appears on new invoices and in the WhatsApp link.",
     runAgent: "Run collections agent", runAgentShort: "Collections agent", approveAll: "Approve all & send", approve: "Approve & send",
@@ -43,44 +43,15 @@ const T = {
     editItem: "Edit item", price: "Price", stock: "Stock", alertAt: "Alert at", cashIn: "Cash received (₹)", resetQ: "Reset all demo data?",
     runFirst: "Run the agent to get today's to-do list.", retry: "Retry",
   },
-  hi: {
-    todaySales: "आज की बिक्री", udhaarTotal: "कुल उधार बाकी", ppCollected: "PayPal से वसूली", lowStock: "कम स्टॉक",
-    speakOrType: "बोलिए या लिखिए (हिंदी / हिंग्लिश / English)", go: "चलो", recentBills: "हाल के बिल", khata: "खाता (उधार)",
-    lowStockAlerts: "कम स्टॉक", deadstock: "न बिकने वाला माल", aiTips: "✨ AI सुझाव", allItems: "सारा सामान और भाव",
-    gridHint: "भाव, स्टॉक या अलर्ट बदलने के लिए डबल-क्लिक करें", reorderTitle: "स्मार्ट ऑर्डर (AI एजेंट)",
-    reorderHelp: "एजेंट कम स्टॉक और बिक्री देखकर हर सप्लायर का ऑर्डर बनाता है। आपकी मंज़ूरी के बाद ही PayPal से भुगतान होता है।",
-    checkStock: "स्टॉक जांचें और ऑर्डर बनाएं", askShop: "दुकान से पूछें", ask: "पूछें", marketNews: "बाज़ार की खबर", refresh: "ताज़ा करें",
-    demo: "डेमो", resetDemo: "डेमो डेटा रीसेट", tabBill: "बिल", tabKhata: "खाता", tabCollect: "वसूली", tabStock: "स्टॉक",
-    tabReorder: "ऑर्डर", tabInsights: "जानकारी", micLang: "माइक: हिंदी", micLangEn: "माइक: English", confirmBill: "बिल सेव करें",
-    cash: "नकद", udhaar: "उधार", customer: "ग्राहक", total: "कुल", cancel: "रद्द", saved: "सेव हो गया", sendInvoice: "PayPal इनवॉइस भेजें",
-    sync: "स्टेटस जांचें", recordCash: "नकद भुगतान दर्ज करें", openLink: "भुगतान लिंक", balance: "बाकी", addPayment: "नकद मिला",
-    noBills: "आज अभी कोई बिल नहीं। माइक दबाइए!", approvePay: "मंज़ूर करें, PayPal से भुगतान", listening: "सुन रहा हूँ…",
-    noLow: "सब ठीक है, कुछ भी कम नहीं।", noDead: "कोई पड़ा हुआ माल नहीं।", confirm: "पक्का करें", paid: "भुगतान हो गया",
-    noMic: "आवाज़ के लिए Android/कंप्यूटर पर Chrome चाहिए। आप लिख भी सकते हैं।", payment: "भुगतान मिला",
-    priceUpdate: "भाव बदलें", stockAdd: "स्टॉक जोड़ें", aiAnswer: "जवाब", noItems: "कोई सामान नहीं पहचाना।", save: "सेव",
-    trend: "पिछले 14 दिन", trendSub: "बिक्री · उधार दिया · वसूली", history: "पिछली बार",
-    collectTitle: "AI वसूली एजेंट",
-    collectHelp: "हर खुला खाता देखता है, तय करता है आज किसे याद दिलाना है, विनम्र संदेश लिखता है और PayPal इनवॉइस/रिमाइंडर भेजता है। आपकी मंज़ूरी के बिना कुछ नहीं जाता।",
-    collectNote: "PayPal रिमाइंडर ईमेल PayPal के मानक शब्दों में जाता है। AI का संदेश नए इनवॉइस और WhatsApp लिंक में दिखता है।",
-    runAgent: "वसूली एजेंट चलाएं", runAgentShort: "वसूली एजेंट", approveAll: "सब मंज़ूर करें और भेजें", approve: "मंज़ूर करें और भेजें",
-    skip: "छोड़ें", whatsapp: "WhatsApp", payLink: "भुगतान लिंक", sent: "भेज दिया", failed: "असफल", skipped: "छोड़ा", waiting: "रुकें",
-    proposed: "मंज़ूरी बाकी", agentThinking: "एजेंट खाता देख रहा है…", noCollect: "अभी किसी का उधार बाकी नहीं। बढ़िया!",
-    overdue: "दिन से बाकी", newInvoice: "नया PayPal इनवॉइस", reminder: "PayPal रिमाइंडर", understoodBy: "समझा",
-    editItem: "सामान बदलें", price: "भाव", stock: "स्टॉक", alertAt: "अलर्ट", cashIn: "नकद मिला (₹)", resetQ: "सारा डेमो डेटा रीसेट करें?",
-    runFirst: "आज की सूची के लिए एजेंट चलाएं।", retry: "फिर से",
-  },
 };
-const t = (k) => (T[LANG] && T[LANG][k]) || T.en[k] || k;
-const itemName = (it) => (LANG === "hi" && it.name_hi ? `${it.name_hi} · ${it.name}` : it.name);
+T.en.micLang = "Mic: Hindi speech"; T.en.micLangEn = "Mic: English speech"; T.en.tabCollect = "Collections";
+const t = (k) => T.en[k] || k;
+const itemName = (it) => it.name;
 
 function applyLang() {
-  document.documentElement.lang = LANG;
-  $$("[data-i18n]").forEach((el) => (el.textContent = t(el.dataset.i18n)));
   $("#micLangBtn").textContent = MIC_LANG === "hi-IN" ? t("micLang") : t("micLangEn");
-  $("#micLang").textContent = MIC_LANG === "hi-IN" ? "हिं" : "EN";
-  $("#topDate").textContent = new Date().toLocaleDateString(LANG === "hi" ? "hi-IN" : "en-IN", { weekday: "long", day: "numeric", month: "long" });
-  if (STATE) renderAll();
-  if (COLLECT) renderCollections();
+  $("#micLang").textContent = MIC_LANG === "hi-IN" ? "HI" : "EN";
+  $("#topDate").textContent = new Date().toLocaleDateString("en-IN", { weekday: "long", day: "numeric", month: "long" });
 }
 
 function toast(msg, isErr = false) {
@@ -152,8 +123,25 @@ function renderAll() {
   $("#statusBar").textContent = warn.join(" · ");
   $("#statusBar").classList.toggle("hidden", !warn.length);
   const sys = `AI: ${s.ai ? "Gemini ✓" : "off"} · PayPal sandbox: ${s.paypal ? "✓" : "off"} · ₹${window.CONFIG.inrPerUsd} = $1`;
-  $("#sysInfo").textContent = sys; $("#sysInfo2").textContent = sys;
-  renderRecent(); renderCustomers(); renderStock(); renderPOs(s.pos);
+  $("#sysInfo").textContent = sys;
+  $("#sysInfo2").textContent = `${s.ai ? "Gemini" : "Offline AI"} · PayPal ${s.paypal ? "sandbox" : "off"}`;
+  renderAttention(); renderRecent(); renderCustomers(); renderStock(); renderPOs(s.pos);
+}
+
+function renderAttention() {
+  const s = STATE;
+  const debtors = s.customers.filter((c) => c.balance > 0);
+  const owed = debtors.reduce((a, c) => a + c.balance, 0);
+  const drafts = (s.pos || []).filter((p) => p.status === "draft").length;
+  const items = [
+    { tab: "collect", ico: "i-collect", cls: s.to_approve ? "amber" : "blue", b: s.to_approve ? `${s.to_approve} collection action${s.to_approve > 1 ? "s" : ""} awaiting approval` : "Run the collections agent",
+      sub: debtors.length ? `${debtors.length} customers owe ${rs(owed)} in total` : "No udhaar outstanding right now" },
+    { tab: "stock", ico: "i-stock", cls: s.low_stock.length ? "red" : "green", b: s.low_stock.length ? `${s.low_stock.length} item${s.low_stock.length > 1 ? "s" : ""} running low` : "Stock levels are healthy",
+      sub: s.low_stock.length ? s.low_stock.slice(0, 3).map((i) => i.name).join(", ") : `${s.deadstock.length} deadstock item${s.deadstock.length === 1 ? "" : "s"} worth reviewing` },
+    { tab: "reorder", ico: "i-reorder", cls: drafts ? "amber" : "blue", b: drafts ? `${drafts} supplier order${drafts > 1 ? "s" : ""} awaiting PayPal approval` : "No supplier orders pending",
+      sub: drafts ? "Review quantities, then pay with PayPal" : "The reorder agent drafts orders when stock runs low" },
+  ];
+  $("#attention").innerHTML = items.map((i) => `<div class="attn" onclick="goTab('${i.tab}')"><div class="ico ${i.cls}"><svg><use href="#${i.ico}"/></svg></div><div><b>${esc(i.b)}</b><span>${esc(i.sub)}</span></div></div>`).join("");
 }
 
 function renderRecent() {
@@ -282,7 +270,7 @@ async function runCommand() {
   const text = $("#cmd").value.trim();
   if (!text) return;
   const box = $("#preview");
-  box.innerHTML = `<div class="card preview thinking"><div class="spinner"></div><div><div class="t">${LANG === "hi" ? "समझ रहा हूँ…" : "Understanding…"}</div><div class="s muted">${esc(text)}</div></div></div>`;
+  box.innerHTML = `<div class="card preview thinking"><div class="spinner"></div><div><div class="t">Understanding…</div><div class="s muted">${esc(text)}</div></div></div>`;
   const t0 = performance.now();
   await busy($("#goBtn"), async () => {
     try {
@@ -542,9 +530,9 @@ async function loadChart() {
     const labels = series.map((d) => d.date.slice(5).replace("-", "/"));
     const ds = (label, key, color, fill) => ({ label, data: series.map((d) => d[key]), borderColor: color, backgroundColor: fill || color, tension: .35, borderWidth: 2.5, pointRadius: 2 });
     const cfg = { type: "line", data: { labels, datasets: [
-      ds(LANG === "hi" ? "बिक्री" : "Sales", "sales", "#0070e0", "rgba(0,112,224,.12)"),
-      ds(LANG === "hi" ? "उधार दिया" : "Udhaar given", "udhaar", "#b54708"),
-      ds(LANG === "hi" ? "वसूली" : "Collected", "collected", "#118c4f") ] },
+      ds("Sales", "sales", "#0070e0", "rgba(0,112,224,.12)"),
+      ds("Udhaar given", "udhaar", "#b54708"),
+      ds("Collected", "collected", "#118c4f") ] },
       options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
         plugins: { legend: { position: "bottom", labels: { boxWidth: 12, usePointStyle: true } }, tooltip: { callbacks: { label: (c) => ` ${c.dataset.label}: ${rs(c.parsed.y)}` } } },
         scales: { y: { beginAtZero: true, ticks: { callback: (v) => "₹" + (v >= 1000 ? (v / 1000) + "k" : v) }, grid: { color: "#eef2f7" } }, x: { grid: { display: false } } } } };
@@ -583,8 +571,6 @@ window.goTab = goTab;
 // ------------------------------------------------------------------ wire up
 document.addEventListener("DOMContentLoaded", async () => {
   $$(".tabs button").forEach((b) => b.addEventListener("click", () => goTab(b.dataset.tab)));
-  const flip = () => { LANG = LANG === "en" ? "hi" : "en"; localStorage.setItem("lang", LANG); applyLang(); if (CHART) loadChart(); };
-  $("#langBtn").onclick = flip; $("#langBtn2").onclick = flip;
   $("#goBtn").onclick = runCommand;
   $("#cmd").addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); runCommand(); } });
   $$(".ex").forEach((x) => (x.onclick = () => { $("#cmd").value = x.textContent; runCommand(); }));

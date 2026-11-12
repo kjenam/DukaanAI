@@ -19,8 +19,7 @@
     let cols, extra = {};
     if (kind === "items") {
       cols = [
-        { field: "name", headerName: "Item", flex: 2, minWidth: 180, filter: true,
-          cellRenderer: (p) => p.data.name_hi ? `${p.data.name_hi} <span style="color:#64748b">· ${p.data.name}</span>` : p.data.name },
+        { field: "name", headerName: "Item", flex: 2, minWidth: 180, filter: true },
         { field: "category", headerName: "Category", width: 120, filter: true },
         { field: "stock", headerName: "Stock", width: 110, editable: true, valueParser: num, type: "rightAligned",
           valueFormatter: (p) => `${p.value} ${p.data.unit}` },

@@ -4,7 +4,7 @@
 Built for the PayPal AI Hackathon 2026 by a team from a small village in Rajasthan, for our own family's grocery shop.
 
 The shopkeeper talks in Hindi or Hinglish: *"Sharma ji do kilo cheeni, ek Fortune tel, udhaar me likho."*
-Gemini turns it into a bill, updates stock and writes it in the khata (credit ledger). An **AI collections agent**
+Gemini turns it into a bill, updates stock and writes it in the khata (credit ledger). The interface itself is in English. An **AI collections agent**
 decides who to nudge for udhaar, writes a polite message, and uses **PayPal Invoicing** to collect. When stock runs
 low, a **reorder agent** drafts supplier orders that the owner pays with **PayPal Orders**. The owner approves every
 rupee that moves.
@@ -20,11 +20,11 @@ rupee that moves.
 |---|---|---|---|
 | 🧾 | **Voice/text billing** in Hindi, Hinglish, English (Web Speech API + text) | Gemini 3.5 Flash-Lite parses items, quantities, customer, udhaar in ~1–2 s; offline rule parser as fallback | |
 | 📒 | **Khata** (udhaar ledger) per customer with history | | **Invoicing v2**: create + send invoice, sync status, record cash payment |
-| 🤝 | **AI collections agent (वसूली)**: reads every open khata, FIFO-ages the debt, decides *invoice / remind / wait*, writes a Hinglish or Hindi message, owner approves one by one or all at once | Gemini plans + writes; rule planner fallback | **Invoicing v2** send (AI message goes on the invoice) and **remind**; WhatsApp link carries the message + PayPal pay link |
+| 🤝 | **AI collections agent**: reads every open khata, FIFO-ages the debt, decides *invoice / remind / wait*, writes a polite message, owner approves one by one or all at once | Gemini plans + writes; rule planner fallback | **Invoicing v2** send (AI message goes on the invoice) and **remind**; WhatsApp link carries the message + PayPal pay link |
 | 🚚 | **Agentic reorder**: low stock + 14-day sales → draft PO per supplier with reasons → owner edits, approves | Agent drafts quantities | **Orders v2** via PayPal JS SDK buttons (create → approve → capture) |
 | 📦 | **Stock dashboard** (desktop): AG Grid with inline price/stock/alert edits, low-stock and deadstock highlighting, quick filter | Deadstock clearance tips, market price check | |
 | 📊 | **Insights**: 14-day sales / udhaar / collected chart, "ask your shop" chat, market news | Gemini over live shop data (+ Google Search grounding when available) | |
-| 🌐 | Phone-first UI with bottom tabs, desktop sidebar dashboard, English / हिंदी toggle | | |
+| 🏠 | Landing page with today's attention items, phone-first bottom tabs, desktop sidebar dashboard | | |
 
 ## Architecture
 
@@ -89,7 +89,7 @@ With the three keys above in `.env` (the Devpost testing instructions also inclu
 4. **Reorder** (Reorder tab): **Check stock & draft orders** → agent explains each quantity → PayPal button → approve as
    the buyer → captured, stock increases. (If nothing is low, Insights → Reset demo data.)
 5. **Dashboard** (desktop width): Stock tab AG Grid: double-click a price to edit; red rows are low stock, amber are
-   deadstock. Insights: 14-day chart, ask *"Who owes me the most?"*, toggle हिंदी.
+   deadstock. Insights: 14-day chart, ask *"Who owes me the most?"*.
 
 ## Honest limitations
 

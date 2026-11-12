@@ -309,8 +309,8 @@ def collections_plan(rows, lang="en", shop_name="Dukaan Saathi"):
     slim = [{k: r[k] for k in ("customer_id", "name", "balance", "days_overdue", "days_since_payment",
                                 "reminders_sent", "days_since_nudge", "invoice_age_days")} | {"open_invoice": bool(r["open_invoice"])}
             for r in rows]
-    language = ("Write the message in simple Hindi (Devanagari script)" if lang == "hi"
-                else "Write the message in Hinglish (Hindi words in Roman script, like a WhatsApp message)")
+    language = ("Write the message in Hinglish (Hindi words in Roman script, like a WhatsApp message)" if lang == "hi"
+                else "Write the message in simple, warm English, like a WhatsApp message from a neighbourhood shop")
     out = gemini(COLLECTIONS_PROMPT.format(shop=shop_name, min_balance=100, paid_days=7, nudge_days=3,
                                            language=language, rows=json.dumps(slim, ensure_ascii=False)),
                  json_mode=True, max_tokens=2048, timeout=20)   # keep the owner waiting < ~1 min even if a model stalls

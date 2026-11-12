@@ -7,27 +7,48 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23001c64%22/><text x=%2250%22 y=%2268%22 font-size=%2254%22 text-anchor=%22middle%22>🛒</text></svg>">
   <title>Dukaan Saathi · {{ shop_name }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@600;700&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if paypal_client_id %}
   <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&intent=capture&components=buttons" data-namespace="paypal"></script>
   {% endif %}
 </head>
 <body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="i-bill" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
+  <symbol id="i-khata" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></symbol>
+  <symbol id="i-collect" viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2l-7 20-4-9-9-4 20-7z"/></symbol>
+  <symbol id="i-stock" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><path d="M3.3 7l8.7 5 8.7-5M12 22V12"/></symbol>
+  <symbol id="i-reorder" viewBox="0 0 24 24"><path d="M1 3h15v13H1z"/><path d="M16 8h4l3 3v5h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+  <symbol id="i-insights" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/><path d="M3 20h18"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="12" rx="3"/><path d="M5 10a7 7 0 0 0 14 0M12 17v5M8 22h8"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+  <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 2l8 4v6c0 5-3.5 8.5-8 10-4.5-1.5-8-5-8-10V6z"/><path d="M9 12l2 2 4-4"/></symbol>
+</svg>
+
 <div class="app">
   <aside class="side">
-    <div class="brand">दुकान साथी<small>Dukaan Saathi · AI + PayPal for kirana shops</small></div>
+    <a class="brand" href="#" onclick="goTab('home');return false;">
+      <span class="logo"><svg><use href="#i-bill"/></svg></span>
+      <span><span class="brand-name">Dukaan Saathi</span><small>दुकान साथी · Shop assistant</small></span>
+    </a>
+    <div class="nav-label">Menu</div>
     <nav class="tabs">
-      <button data-tab="bill" class="active"><span class="ic">🧾</span><span data-i18n="tabBill">Bill</span></button>
-      <button data-tab="khata"><span class="ic">📒</span><span data-i18n="tabKhata">Khata</span></button>
-      <button data-tab="collect"><span class="ic">🤝</span><span data-i18n="tabCollect">Collect</span><span class="pill hidden" id="collectPill">0</span></button>
-      <button data-tab="stock"><span class="ic">📦</span><span data-i18n="tabStock">Stock</span></button>
-      <button data-tab="reorder"><span class="ic">🚚</span><span data-i18n="tabReorder">Reorder</span></button>
-      <button data-tab="insights"><span class="ic">📊</span><span data-i18n="tabInsights">Insights</span></button>
+      <button data-tab="home" class="active"><svg class="ic"><use href="#i-home"/></svg><span>Home</span></button>
+      <button data-tab="bill"><svg class="ic"><use href="#i-bill"/></svg><span>Billing</span></button>
+      <button data-tab="khata"><svg class="ic"><use href="#i-khata"/></svg><span>Khata</span></button>
+      <button data-tab="collect"><svg class="ic"><use href="#i-collect"/></svg><span class="lbl-l">Collections</span><span class="lbl-s">Collect</span><span class="pill hidden" id="collectPill">0</span></button>
+      <button data-tab="stock"><svg class="ic"><use href="#i-stock"/></svg><span>Stock</span></button>
+      <button data-tab="reorder"><svg class="ic"><use href="#i-reorder"/></svg><span>Reorder</span></button>
+      <button data-tab="insights"><svg class="ic"><use href="#i-insights"/></svg><span>Insights</span></button>
     </nav>
     <div class="side-foot">
-      <button id="langBtn2" class="chip small light" aria-label="Switch language">हिंदी / English</button>
-      <div id="sysInfo2"></div>
+      <div class="shop-card">
+        <div class="avatar">{{ shop_name[:1] }}</div>
+        <div class="grow"><div class="shop-name">{{ shop_name }}</div><div class="shop-sub" id="sysInfo2">Connecting…</div></div>
+      </div>
+      <div class="side-powered"><svg><use href="#i-shield"/></svg> Owner approves every payment</div>
     </div>
   </aside>
 
@@ -35,36 +56,80 @@
     <header class="top">
       <div class="top-row">
         <div>
-          <div class="brand-m">दुकान साथी <span>Dukaan Saathi</span></div>
+          <div class="brand-m">Dukaan Saathi</div>
           <div class="shop">{{ shop_name }}</div>
           <div class="small muted" id="topDate"></div>
         </div>
-        <button id="langBtn" class="chip small light" aria-label="Switch language">हिं / EN</button>
+        <button class="chip small light" onclick="goTab('home')">Home</button>
       </div>
       <section class="stats">
-        <div class="stat"><div class="k" data-i18n="todaySales">Today's sales</div><div class="v" id="statSales">₹0</div></div>
-        <div class="stat"><div class="k" data-i18n="udhaarTotal">Udhaar outstanding</div><div class="v" id="statUdhaar">₹0</div></div>
-        <div class="stat pp"><div class="k" data-i18n="ppCollected">Collected via PayPal</div><div class="v" id="statPP">₹0</div></div>
-        <div class="stat warn" id="statLowWrap"><div class="k" data-i18n="lowStock">Low stock items</div><div class="v" id="statLow">0</div></div>
+        <div class="stat"><div class="k">Today's sales</div><div class="v" id="statSales">₹0</div></div>
+        <div class="stat"><div class="k">Udhaar outstanding</div><div class="v" id="statUdhaar">₹0</div></div>
+        <div class="stat pp"><div class="k">Collected via PayPal</div><div class="v" id="statPP">₹0</div></div>
+        <div class="stat warn" id="statLowWrap"><div class="k">Low stock items</div><div class="v" id="statLow">0</div></div>
       </section>
     </header>
 
     <div id="statusBar" class="status hidden"></div>
 
     <main>
+      <!-- HOME / LANDING -->
+      <section class="tab active" id="tab-home">
+        <div class="welcome">
+          <div class="welcome-text">
+            <div class="eyebrow">Welcome to the</div>
+            <h1>Dukaan Saathi dashboard</h1>
+            <p>Your AI shop assistant with PayPal built in. Bill by voice, keep the khata, let the collections agent recover udhaar, reorder stock, and see how the shop is really doing.</p>
+            <div class="row gap wrap">
+              <button class="btn primary lg" onclick="goTab('bill')"><svg class="bi"><use href="#i-mic"/></svg> Start billing</button>
+              <button class="btn gold lg" onclick="goTab('collect')"><svg class="bi"><use href="#i-collect"/></svg> Run collections agent</button>
+            </div>
+          </div>
+          <div class="welcome-art" aria-hidden="true">
+            <div class="orb"></div>
+            <div class="float-card c1"><span class="dotg"></span> Invoice paid · ₹4,126</div>
+            <div class="float-card c2">"2 kilo cheeni, udhaar" → bill in 1.8 s</div>
+            <div class="float-card c3">Reorder approved · PayPal</div>
+          </div>
+        </div>
+
+        <div class="card attention">
+          <h3>Needs your attention today</h3>
+          <div id="attention" class="attn-grid"></div>
+        </div>
+
+        <div class="nav-grid">
+          <a class="nav-card" onclick="goTab('bill')"><svg><use href="#i-bill"/></svg><b>Billing</b><span>Speak or type a sale in Hindi, Hinglish or English. Preview, then save. Stock and khata update automatically.</span><em>Open <svg class="arr"><use href="#i-arrow"/></svg></em></a>
+          <a class="nav-card" onclick="goTab('khata')"><svg><use href="#i-khata"/></svg><b>Khata</b><span>Every customer's udhaar balance and history. Send a PayPal invoice, sync its status, or record cash.</span><em>Open <svg class="arr"><use href="#i-arrow"/></svg></em></a>
+          <a class="nav-card hi" onclick="goTab('collect')"><svg><use href="#i-collect"/></svg><b>Collections agent</b><span>AI decides who to nudge today and drafts a polite message. You approve; PayPal sends the invoice or reminder.</span><em>Open <svg class="arr"><use href="#i-arrow"/></svg></em></a>
+          <a class="nav-card" onclick="goTab('stock')"><svg><use href="#i-stock"/></svg><b>Stock</b><span>Low-stock alerts, deadstock with AI clearance tips, and an editable price and stock table.</span><em>Open <svg class="arr"><use href="#i-arrow"/></svg></em></a>
+          <a class="nav-card" onclick="goTab('reorder')"><svg><use href="#i-reorder"/></svg><b>Reorder</b><span>The agent drafts supplier orders from low stock and recent sales. Approve and pay the supplier with PayPal.</span><em>Open <svg class="arr"><use href="#i-arrow"/></svg></em></a>
+          <a class="nav-card" onclick="goTab('insights')"><svg><use href="#i-insights"/></svg><b>Insights</b><span>14-day sales, udhaar and collections chart, market news, and plain-language questions about your shop.</span><em>Open <svg class="arr"><use href="#i-arrow"/></svg></em></a>
+        </div>
+
+        <div class="card how">
+          <h3>How it works</h3>
+          <div class="steps">
+            <div><span class="n">1</span><b>You speak</b><p>Gemini turns a sentence into items, quantities, customer and udhaar in about two seconds.</p></div>
+            <div><span class="n">2</span><b>Agents propose</b><p>Collections and reorder agents read the data, decide, and explain their reasoning. Nothing is sent on its own.</p></div>
+            <div><span class="n">3</span><b>You approve, PayPal moves the money</b><p>Invoices, reminders and supplier payments run on PayPal Invoicing and Orders in sandbox.</p></div>
+          </div>
+        </div>
+      </section>
+
       <!-- BILL -->
-      <section class="tab active" id="tab-bill">
+      <section class="tab" id="tab-bill">
         <div class="cols wide-left">
           <div>
             <div class="card hero">
-              <label class="lbl" for="cmd" data-i18n="speakOrType">Speak or type (Hindi / Hinglish / English)</label>
+              <label class="lbl" for="cmd">Speak or type a sale (Hindi, Hinglish or English)</label>
               <div class="cmd-row">
-                <button id="micBtn" class="mic" aria-label="Start voice input"><span class="dot"></span><span id="micLang">हिं</span></button>
+                <button id="micBtn" class="mic" aria-label="Start voice input"><svg class="bi"><use href="#i-mic"/></svg><span id="micLang">HI</span></button>
                 <textarea id="cmd" rows="2" placeholder="Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar me likho"></textarea>
               </div>
               <div class="row gap">
-                <button id="micLangBtn" class="chip small" data-i18n="micLang">Mic: Hindi</button>
-                <button id="goBtn" class="btn primary grow" data-i18n="go">Go</button>
+                <button id="micLangBtn" class="chip small">Mic: Hindi speech</button>
+                <button id="goBtn" class="btn primary grow">Go</button>
               </div>
               <div class="examples">
                 <span class="ex">Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar</span>
@@ -72,13 +137,13 @@
                 <span class="ex">Meena Devi ne 500 rupaye jama kiye</span>
                 <span class="ex">cheeni ab 46 rupaye kilo</span>
                 <span class="ex">50 kilo cheeni aayi</span>
-                <span class="ex">sabse zyada udhaar kiska hai?</span>
+                <span class="ex">Who owes the most udhaar?</span>
               </div>
             </div>
             <div id="preview"></div>
           </div>
           <div class="card">
-            <h3 data-i18n="recentBills">Recent bills</h3>
+            <h3>Recent bills</h3>
             <div id="recentBills" class="list"></div>
           </div>
         </div>
@@ -88,7 +153,7 @@
       <section class="tab" id="tab-khata">
         <div class="cols">
           <div class="card">
-            <div class="row between wrap gap"><h3 data-i18n="khata">Khata (udhaar)</h3><button class="btn sm navy" onclick="goTab('collect')">🤝 <span data-i18n="runAgentShort">Collections agent</span></button></div>
+            <div class="row between wrap gap"><h3>Khata (udhaar ledger)</h3><button class="btn sm navy" onclick="goTab('collect')">Collections agent</button></div>
             <input id="custSearch" class="input" placeholder="Search customer…">
             <div id="custList" class="list list-only"></div>
             <div id="custGrid" class="grid grid-only" style="margin-top:10px;height:420px"></div>
@@ -103,24 +168,24 @@
           <div>
             <div class="card hero">
               <div class="agent-head">
-                <div class="agent-icon">🤝</div>
+                <div class="agent-icon"><svg><use href="#i-collect"/></svg></div>
                 <div class="grow">
-                  <h3 style="margin:0" data-i18n="collectTitle">AI collections agent · वसूली</h3>
-                  <p class="muted small" style="margin:4px 0 0" data-i18n="collectHelp">Reads every open khata, decides who to nudge today, writes a polite message, and uses PayPal invoices and reminders. Nothing is sent until you approve.</p>
+                  <h3 style="margin:0">AI collections agent</h3>
+                  <p class="muted small" style="margin:4px 0 0">Reads every open khata, decides who to nudge today, writes a polite message, and uses PayPal invoices and reminders. Nothing is sent until you approve.</p>
                 </div>
               </div>
               <div class="row gap wrap" style="margin-top:14px">
-                <button id="collectRun" class="btn primary" data-i18n="runAgent">Run collections agent</button>
-                <button id="collectAll" class="btn gold hidden" data-i18n="approveAll">Approve all & send</button>
+                <button id="collectRun" class="btn primary">Run collections agent</button>
+                <button id="collectAll" class="btn gold hidden">Approve all & send</button>
                 <span id="collectSummary" class="small muted"></span>
               </div>
             </div>
             <div id="collectBox"></div>
           </div>
           <div class="card">
-            <h3 data-i18n="history">Past runs</h3>
+            <h3>Past runs</h3>
             <div id="collectHistory" class="log list"></div>
-            <p class="small muted" data-i18n="collectNote">PayPal reminder emails use PayPal's standard text. The AI message appears on new invoices and in the WhatsApp link.</p>
+            <p class="small muted">PayPal reminder emails use PayPal's standard text. The AI message appears on new invoices and in the WhatsApp link.</p>
           </div>
         </div>
       </section>
@@ -129,17 +194,17 @@
       <section class="tab" id="tab-stock">
         <div class="cols">
           <div class="card">
-            <h3 data-i18n="lowStockAlerts">Low stock alerts</h3>
+            <h3>Low stock alerts</h3>
             <div id="lowList" class="list"></div>
           </div>
           <div class="card">
-            <div class="row between"><h3 data-i18n="deadstock">Deadstock</h3><button class="chip small" id="deadRefresh" data-i18n="aiTips">✨ AI tips</button></div>
+            <div class="row between"><h3>Deadstock</h3><button class="chip small" id="deadRefresh">✨ AI tips</button></div>
             <div id="deadList" class="list"></div>
             <div id="deadAdvice" class="ai-box hidden"></div>
           </div>
         </div>
         <div class="card">
-          <div class="row between wrap gap"><h3 data-i18n="allItems">All items & prices</h3><span class="small muted grid-only" data-i18n="gridHint">Double-click price, stock or alert level to edit</span></div>
+          <div class="row between wrap gap"><h3>All items & prices</h3><span class="small muted grid-only">Double-click price, stock or alert level to edit</span></div>
           <input id="itemSearch" class="input" placeholder="Search item…">
           <div id="itemList" class="list list-only"></div>
           <div id="itemGrid" class="grid grid-only" style="margin-top:10px"></div>
@@ -149,9 +214,9 @@
       <!-- REORDER -->
       <section class="tab" id="tab-reorder">
         <div class="card hero">
-          <h3 data-i18n="reorderTitle">Smart reorder (AI agent)</h3>
-          <p class="muted" data-i18n="reorderHelp">The agent checks low stock and recent sales, drafts an order per supplier, and pays through PayPal only after you approve.</p>
-          <button id="suggestBtn" class="btn primary" data-i18n="checkStock">Check stock & draft orders</button>
+          <h3>Smart reorder (AI agent)</h3>
+          <p class="muted">The agent checks low stock and recent sales, drafts an order per supplier, and pays through PayPal only after you approve.</p>
+          <button id="suggestBtn" class="btn primary">Check stock & draft orders</button>
         </div>
         <div id="poList" class="cols"></div>
       </section>
@@ -160,32 +225,32 @@
       <section class="tab" id="tab-insights">
         <div class="cols">
           <div class="card">
-            <h3 data-i18n="trend">Last 14 days<span class="sub" data-i18n="trendSub">sales · udhaar given · collected</span></h3>
+            <h3>Last 14 days<span class="sub">sales · udhaar given · collected</span></h3>
             <div class="chart-wrap"><canvas id="salesChart"></canvas></div>
           </div>
           <div class="card">
-            <h3 data-i18n="askShop">Ask your shop</h3>
+            <h3>Ask your shop</h3>
             <div class="row gap">
               <input id="chatQ" class="input grow" placeholder="Who owes the most? What sold most this week?">
-              <button id="chatBtn" class="btn primary" data-i18n="ask">Ask</button>
+              <button id="chatBtn" class="btn primary">Ask</button>
             </div>
             <div class="examples">
               <span class="exq">Who owes me the most?</span>
               <span class="exq">Top 5 items this week by profit?</span>
-              <span class="exq">इस हफ्ते कितनी बिक्री हुई?</span>
+              <span class="exq">How much did we sell this week?</span>
             </div>
             <div id="chatA" class="ai-box hidden"></div>
           </div>
         </div>
         <div class="cols">
           <div class="card">
-            <div class="row between"><h3 data-i18n="marketNews">Market news</h3><button class="chip small" id="newsRefresh" data-i18n="refresh">Refresh</button></div>
+            <div class="row between"><h3>Market news</h3><button class="chip small" id="newsRefresh">Refresh</button></div>
             <div id="news" class="ai-box muted">…</div>
           </div>
           <div class="card">
             <div class="row between">
-              <h3 data-i18n="demo">Demo tools</h3>
-              <button class="chip small" id="resetBtn" data-i18n="resetDemo">Reset demo data</button>
+              <h3>Demo tools</h3>
+              <button class="chip small" id="resetBtn">Reset demo data</button>
             </div>
             <p class="muted small" id="sysInfo"></p>
           </div>

@@ -87,10 +87,10 @@ def template_message(r, lang, shop_name):
     first = r["name"].split()[0]
     amt = f"₹{r['balance']:,.0f}"
     if lang == "hi":
-        return (f"नमस्ते {first} जी, {shop_name} से। आपका खाता बकाया {amt} है ({r['days_overdue']} दिन से)। "
-                f"नीचे दिए PayPal लिंक से आराम से भुगतान कर दीजिए। धन्यवाद 🙏")
-    return (f"Namaste {first} ji, {shop_name} se. Aapka khata balance {amt} hai ({r['days_overdue']} din se). "
-            f"Neeche diye PayPal link se jab suvidha ho bhugtaan kar dijiye. Dhanyavaad 🙏")
+        return (f"Namaste {first} ji, {shop_name} se. Aapka khata balance {amt} hai ({r['days_overdue']} din se). "
+                f"Neeche diye PayPal link se jab suvidha ho bhugtaan kar dijiye. Dhanyavaad 🙏")
+    return (f"Hello {first} ji, this is {shop_name}. Your khata balance is {amt}, pending for {r['days_overdue']} days. "
+            f"You can pay whenever convenient using the PayPal link below. Thank you 🙏")
 
 
 def wa_link(phone, message, pay_url=None):

@@ -32,7 +32,7 @@ def _post(model, body, timeout):
     return _session.post(GEMINI_URL.format(model=model), params={"key": _key()}, json=body, timeout=timeout)
 
 
-def gemini(prompt, json_mode=False, search=False, fast=False, max_tokens=None):
+def gemini(prompt, json_mode=False, search=False, fast=False, max_tokens=None, timeout=None):
     """Call Gemini; returns text or None on any failure (caller falls back).
 
     fast=True uses the low-latency chain with minimal thinking (billing commands).
@@ -40,7 +40,7 @@ def gemini(prompt, json_mode=False, search=False, fast=False, max_tokens=None):
     if not _key():
         return None
     chain = FAST_CHAIN if fast else SMART_CHAIN
-    timeout = FAST_TIMEOUT if fast else SMART_TIMEOUT
+    timeout = timeout or (FAST_TIMEOUT if fast else SMART_TIMEOUT)
     gen = {"temperature": 0.2, "maxOutputTokens": max_tokens or (768 if fast else 2048),
            "thinkingConfig": {"thinkingLevel": "minimal" if fast else "low"}}
     if json_mode:
@@ -313,7 +313,7 @@ def collections_plan(rows, lang="en", shop_name="Dukaan Saathi"):
                 else "Write the message in Hinglish (Hindi words in Roman script, like a WhatsApp message)")
     out = gemini(COLLECTIONS_PROMPT.format(shop=shop_name, min_balance=100, paid_days=7, nudge_days=3,
                                            language=language, rows=json.dumps(slim, ensure_ascii=False)),
-                 json_mode=True, max_tokens=4096)
+                 json_mode=True, max_tokens=2048, timeout=20)   # keep the owner waiting < ~1 min even if a model stalls
     if not out:
         return None
     m = re.search(r"\[.*\]", out, re.S)

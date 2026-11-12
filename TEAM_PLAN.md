@@ -1,34 +1,27 @@
-# Team plan: 2 people, deadline 13 Nov 1:30 AM IST (12 Nov 12:00 PM PT)
+# Team plan: deadline 13 Nov 1:30 AM IST (12 Nov 3:00 PM EST)
 
-**Aim to submit by 11:00 PM IST on 12 Nov.** Devpost gets slow near the deadline.
+**Target: submit on Devpost by 11:00 PM IST on 12 Nov.** Code freeze 10:00 PM IST.
 
-## Who owns what
+## Status (12 Nov evening)
 
-| | Person A: AI + data | Person B: PayPal + UI + deploy |
-|---|---|---|
-| Files | `ai.py`, `db.py`, `app.py` (billing, khata, insights routes) | `paypal.py`, `static/app.js`, `templates/index.html`, `render.yaml`, `app.py` (invoice/PO routes) |
-| Keys | Gemini key | PayPal sandbox app + 2–3 sandbox accounts |
-| Tasks | Test 20+ real voice commands in Hindi/Hinglish, fix the prompt in `PARSE_PROMPT` for misses · replace seed items/prices with your real shop's · check deadstock/news output · write the Devpost text | Invoice: send → pay as sandbox buyer → Sync → khata clears · Record cash · Reorder: approve → capture → stock up · GitHub + Render deploy · test the mic on a phone · record the demo video |
+Done and tested in sandbox: fast Gemini parse (1–2 s), invoice send → pay → sync (PAID), record cash (MARKED_AS_PAID),
+reorder create → approve → capture (stock up), AI collections agent (plan → approve → PayPal invoice/remind → WhatsApp
+link), new responsive UI (phone tabs + desktop AG Grid dashboard + chart), README, DEVPOST.md, DEMO_SCRIPT.md.
 
-The API contract between you is already fixed in `app.py` (`/api/...` routes return JSON). Avoid editing the same file at the same time.
-If you must, tell each other first, or use separate Git branches.
+## Who does what tonight
 
-## Timeline (IST)
-
-| When | Person A | Person B |
-|---|---|---|
-| **Tonight, till ~1:00 AM** | Run locally, add Gemini key, try the 6 example chips + 10 own commands | Run locally, add PayPal keys, send 1 invoice and pay it in sandbox, approve 1 reorder |
-| 12 Nov 9:00–12:00 | Fix parse misses · real item list & prices | Push to GitHub · deploy on Render · open on phone, test mic over HTTPS |
-| 12:00–16:00 | Polish Hindi UI text, deadstock/news prompts | Fix any PayPal edge cases · make the demo flow smooth (pre-login sandbox buyer) |
-| 16:00–19:00 | Write Devpost: Inspiration, What it does, How we built it, Challenges, What's next | Record the 2–3 min video (script in README), upload to YouTube (unlisted is fine) |
-| 19:00–21:00 | Both: fresh **Reset demo data** on the live URL, full run-through as a judge would | |
-| **By 23:00** | **Submit on Devpost**: live URL, GitHub repo, video link, test instructions (sandbox buyer login for judges) | |
+| Person A (owner of the repo) | Person B |
+|---|---|
+| Push `DukaanAi` to a public GitHub repo, deploy on Render via Blueprint, add env vars (Gemini key, PayPal client id/secret, `PAYPAL_DEMO_BUYER_EMAIL` = the US sandbox buyer) | Read `DEMO_SCRIPT.md`; log in to sandbox.paypal.com as the US buyer in a second tab; warm up the Render URL |
+| On the live URL: Insights → Reset demo data, run the 5 judge steps from the README once | Record the 3-minute video on the live URL (desktop + phone/device mode), upload to YouTube (unlisted is fine) |
+| Fill the Devpost form from `DEVPOST.md`: description, tools, repo link, live URL, video link, testing instructions with the sandbox buyer email + password | Send the video link to A by 10:30 PM |
+| Final check: repo public, no `.env` committed, README links filled in | Watch the submission confirmation arrive |
 
 ## Submission checklist
 
-- [ ] Live Render URL works on a phone (first load may be slow, so warm it up before judging)
-- [ ] GitHub repo public, README up to date, **no `.env` committed**
-- [ ] Demo video ≤ 3 min shows: voice bill → PayPal invoice paid → agent reorder paid with PayPal
-- [ ] Devpost "Built with": Python, Flask, SQLite, Gemini API, PayPal Invoicing API, PayPal Orders API, PayPal JS SDK, Web Speech API, Render
-- [ ] Testing instructions for judges include a sandbox buyer email/password to approve payments
-- [ ] Check the rules page for anything else required (video length, team members added on Devpost)
+- [ ] Live Render URL works on a phone and a laptop (warm it up before judging)
+- [ ] GitHub repo public, README up to date, **no `.env` committed** (`git ls-files | grep .env` shows only `.env.example`)
+- [ ] Video ≤ 3 min shows: voice bill → collections agent → PayPal invoice paid → reorder paid with PayPal → dashboard
+- [ ] Devpost "Built with": Python, Flask, SQLite, Gemini API, PayPal Invoicing API, PayPal Orders API, PayPal JS SDK, AG Grid, Chart.js, Web Speech API, Render
+- [ ] Testing instructions include the sandbox buyer email/password
+- [ ] Both team members added on Devpost

@@ -172,8 +172,9 @@ def state():
     c = conn()
     today = db.now().date().isoformat()
     t = db.one(c, "SELECT COALESCE(SUM(total),0) s, COUNT(*) n FROM bills WHERE created_at >= ?", (today,))
-    recent = db.rows(c, """SELECT b.*, cu.name AS customer FROM bills b LEFT JOIN customers cu ON cu.id=b.customer_id
-                           WHERE b.raw_text != 'seed' ORDER BY b.id DESC LIMIT 8""")
+    recent = db.rows(c, """SELECT b.id, b.customer_id, b.total, b.mode, b.created_at, cu.name AS customer,
+                                  CASE WHEN b.raw_text = 'seed' THEN '' ELSE b.raw_text END AS raw_text
+                           FROM bills b LEFT JOIN customers cu ON cu.id=b.customer_id ORDER BY b.created_at DESC, b.id DESC LIMIT 8""")
     customers = customers_with_balance()
     return jsonify({
         "shop": SHOP_NAME, "ai": ai.available(), "paypal": paypal.configured(),

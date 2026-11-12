@@ -1,0 +1,125 @@
+- generic [active] [ref=f47e1]:
+  - banner [ref=f47e3]:
+    - generic [ref=f47e5]:
+      - link [ref=f47e6] [cursor=pointer]:
+        - /url: /myaccount/summary
+        - img "Dashboard" [ref=f47e8]
+      - navigation [ref=f47e9]:
+        - list [ref=f47e10]:
+          - listitem [ref=f47e11]:
+            - link "Home" [ref=f47e12] [cursor=pointer]:
+              - /url: /myaccount/summary
+          - listitem [ref=f47e13]:
+            - link "Finances" [ref=f47e14] [cursor=pointer]:
+              - /url: /myaccount/crypto
+          - listitem [ref=f47e15]:
+            - link "Send and Request" [ref=f47e16] [cursor=pointer]:
+              - /url: /myaccount/transfer?from=Header
+          - listitem [ref=f47e17]:
+            - link "Rewards" [ref=f47e18] [cursor=pointer]:
+              - /url: /myaccount/rewards?entry=top_nav
+          - listitem [ref=f47e19]:
+            - link "Wallet" [ref=f47e20] [cursor=pointer]:
+              - /url: /myaccount/money
+          - listitem [ref=f47e21]:
+            - link "Activity" [ref=f47e22] [cursor=pointer]:
+              - /url: /myaccount/activities
+          - listitem [ref=f47e23]:
+            - link "Help" [ref=f47e24] [cursor=pointer]:
+              - /url: /smarthelp/home
+        - list [ref=f47e25]:
+          - listitem [ref=f47e26]:
+            - link "Notifications Notifications" [ref=f47e27] [cursor=pointer]:
+              - /url: "#"
+              - generic: Notifications
+              - generic [ref=f47e28]: Notifications
+          - listitem [ref=f47e29]:
+            - link "Settings" [ref=f47e30] [cursor=pointer]:
+              - /url: /myaccount/profile
+          - listitem [ref=f47e36]:
+            - link "Log Out" [ref=f47e37] [cursor=pointer]:
+              - /url: /signout
+  - generic [ref=f47e38]:
+    - generic [ref=f47e40]:
+      - generic [ref=f47e42]:
+        - heading "Prajapat Kirana Store" [level=2] [ref=f47e48]
+        - generic [ref=f47e49]:
+          - generic [ref=f47e51]:
+            - generic [ref=f47e52]:
+              - button [ref=f47e53] [cursor=pointer]:
+                - img "download icon" [ref=f47e54]
+                - text: Download invoice
+              - paragraph [ref=f47e57]: "Invoice #0005"
+            - separator [ref=f47e58]
+            - generic [ref=f47e59]:
+              - paragraph [ref=f47e62]: Prajapat Kirana Store
+              - generic [ref=f47e64]:
+                - heading "$70.18" [level=2] [ref=f47e65]
+                - paragraph [ref=f47e66]: "Issued: Nov 12, 2026"
+                - generic [ref=f47e67]: Due today
+            - generic [ref=f47e77]:
+              - paragraph [ref=f47e78]: Bill to
+              - paragraph [ref=f47e79]: Sharma ji
+              - paragraph [ref=f47e80]: sb-suh9453880126@personal.example.com
+            - generic [ref=f47e81]:
+              - paragraph [ref=f47e82]: Note from seller
+              - paragraph [ref=f47e83]: Udhaar (credit) balance of ₹6,176.00 at Prajapat Kirana Store. Converted at ₹88 per USD.
+            - generic [ref=f47e84]:
+              - paragraph [ref=f47e85]: Items
+              - generic [ref=f47e87]:
+                - generic [ref=f47e89]:
+                  - paragraph
+                - generic [ref=f47e90]:
+                  - paragraph [ref=f47e92]: Khata balance (udhaar)
+                  - paragraph [ref=f47e94]: $70.18
+                - paragraph [ref=f47e97]: Moong Dal x0.5; Agarbatti x1.0; Turmeric Powder 100g x2.0; Surf Excel 1kg x1.0; Moong Dal x5.0; Haldiram Bhujia 200g x3.0; Wheat Atta (Aashirvaad 5kg) x1.0; Haldiram Bhujia 200g x2.0; Paneer 200g x1.0; Masoor Dal x2.0; Tea (Tata Tea Premium 250g) x1.0; Colgate 100g x1.0; Surf Excel 1kg x3.0; Mustard Oil 1L x1.0; Wheel Detergent 1kg x2.0
+            - generic [ref=f47e100]:
+              - generic [ref=f47e101]:
+                - paragraph [ref=f47e103]: Subtotal
+                - paragraph [ref=f47e105]: $70.18
+              - generic [ref=f47e106]:
+                - paragraph [ref=f47e108]: Total
+                - paragraph [ref=f47e110]: $70.18
+          - generic [ref=f47e112]:
+            - generic [ref=f47e114]:
+              - heading "Amount due" [level=4] [ref=f47e115]
+              - heading "$70.18" [level=3] [ref=f47e116]
+            - generic [ref=f47e180]:
+              - heading "Don't recognize this invoice?" [level=4] [ref=f47e181]
+              - button "Report invoice" [ref=f47e182]:
+                - generic [ref=f47e183] [cursor=pointer]
+              - paragraph [ref=f47e185]: If you don't recognize this invoice, report it. PayPal would never use an invoice or a money request to ask you for your account credentials.
+      - generic [ref=f47e186]:
+        - paragraph [ref=f47e188]: Invoice issued by Test Store (doing business as Prajapat Kirana Store)
+        - generic [ref=f47e190]:
+          - paragraph [ref=f47e191]: Powered by
+          - img "paypal-logo" [ref=f47e192]
+        - link "Share feedback" [ref=f47e194] [cursor=pointer]:
+          - /url: "#"
+    - generic [ref=f47e197]:
+      - list [ref=f47e203]:
+        - listitem [ref=f47e204]:
+          - link "Help" [ref=f47e206] [cursor=pointer]:
+            - /url: /smarthelp/home
+        - listitem [ref=f47e207]:
+          - link "Contact Us" [ref=f47e209] [cursor=pointer]:
+            - /url: /smarthelp/contact-us
+        - listitem [ref=f47e210]:
+          - link "Security" [ref=f47e212] [cursor=pointer]:
+            - /url: /webapps/mpp/paypal-safety-and-security
+        - listitem [ref=f47e213]:
+          - link "Fees" [ref=f47e215] [cursor=pointer]:
+            - /url: /webapps/mpp/paypal-fees
+      - separator [ref=f47e216]
+      - generic [ref=f47e220]:
+        - generic [ref=f47e221]: ©1999-2026 PayPal, Inc. All rights reserved.
+        - list [ref=f47e222]:
+          - listitem [ref=f47e223]:
+            - link "Privacy" [ref=f47e225] [cursor=pointer]:
+              - /url: /privacy-center
+          - listitem [ref=f47e226]:
+            - link "Legal" [ref=f47e228] [cursor=pointer]:
+              - /url: /webapps/mpp/ua/legalhub-full
+          - listitem [ref=f47e229]:
+            - link "Policy updates" [ref=f47e231] [cursor=pointer]:
+              - /url: /webapps/mpp/ua/upcoming-policies-full

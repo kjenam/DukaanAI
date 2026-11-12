@@ -83,16 +83,22 @@ def _id_from(resp):
 
 # ---------------------------------------------------------------- Invoicing v2
 
-def create_and_send_invoice(customer_name, lines, amount_inr, recipient_email=None, shop_name="Dukaan Saathi"):
-    """lines: [{name, qty, amount_inr}] summarised; amounts converted to USD at a fixed rate."""
+def create_and_send_invoice(customer_name, lines, amount_inr, recipient_email=None, shop_name="Dukaan Saathi", note=None):
+    """lines: [{name}] summarised; amounts converted to USD at a fixed rate.
+
+    `note` (e.g. the AI-written collection message) is shown to the payer on the invoice.
+    If PayPal refuses to email the recipient (e.g. India-to-India restriction), the invoice is still
+    issued as a shareable link (send_to_recipient=false) so the shopkeeper can WhatsApp it.
+    """
     usd_total = inr_to_usd(amount_inr)
     first, _, last = customer_name.partition(" ")
+    default_note = (f"Udhaar (credit) balance of ₹{amount_inr:,.2f} at {shop_name}. "
+                    f"Converted at ₹{os.environ.get('INR_PER_USD', '88')} per USD.")
     body = {
         "detail": {
             "currency_code": "USD",
             "invoice_date": date.today().isoformat(),
-            "note": f"Udhaar (credit) balance of ₹{amount_inr:,.2f} at {shop_name}. "
-                    f"Converted at ₹{os.environ.get('INR_PER_USD', '88')} per USD.",
+            "note": (note.strip() + "\n\n" + default_note)[:4000] if note else default_note,
             "payment_term": {"term_type": "DUE_ON_RECEIPT"},
         },
         "invoicer": {"business_name": shop_name},
@@ -110,16 +116,34 @@ def create_and_send_invoice(customer_name, lines, amount_inr, recipient_email=No
                                                         "email_address": recipient_email}}]
     created = _call("POST", "/v2/invoicing/invoices", body)
     inv_id = _id_from(created)
-    _call("POST", f"/v2/invoicing/invoices/{inv_id}/send",
-          {"send_to_invoicer": False, "send_to_recipient": bool(recipient_email)})
+    delivery = "email"
+    try:
+        _call("POST", f"/v2/invoicing/invoices/{inv_id}/send",
+              {"send_to_invoicer": False, "send_to_recipient": bool(recipient_email)})
+    except PayPalError as e:
+        if recipient_email and ("406" in str(e) or "within India" in str(e) or "422" in str(e)):
+            # PayPal will not email this recipient: issue the invoice as a link instead
+            _call("POST", f"/v2/invoicing/invoices/{inv_id}/send", {"send_to_invoicer": False, "send_to_recipient": False})
+            delivery = "link"
+        else:
+            raise
     info = get_invoice(inv_id)
-    return {"paypal_id": inv_id, "amount_usd": usd_total, **info}
+    return {"paypal_id": inv_id, "amount_usd": usd_total, "delivery": delivery, **info}
 
 
 def get_invoice(inv_id):
     inv = _call("GET", f"/v2/invoicing/invoices/{inv_id}")
     meta = inv.get("detail", {}).get("metadata", {})
-    return {"status": inv.get("status", "UNKNOWN"), "pay_url": meta.get("recipient_view_url")}
+    due = inv.get("due_amount", {}).get("value")
+    return {"status": inv.get("status", "UNKNOWN"), "pay_url": meta.get("recipient_view_url"),
+            "due_usd": float(due) if due is not None else None,
+            "invoice_date": inv.get("detail", {}).get("invoice_date")}
+
+
+def remind_invoice(inv_id):
+    """Ask PayPal to email a reminder for an open invoice (204). Subject/note are system-defined."""
+    _call("POST", f"/v2/invoicing/invoices/{inv_id}/remind", {"send_to_invoicer": False, "send_to_recipient": True})
+    return get_invoice(inv_id)
 
 
 def record_cash_payment(inv_id, amount_usd):

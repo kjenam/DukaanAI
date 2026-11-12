@@ -1,0 +1,33 @@
+- main [ref=e2]:
+  - generic [ref=e6]:
+    - img "PayPal Logo" [ref=e8]
+    - heading "Pay with PayPal" [level=1] [ref=e9]
+    - paragraph [ref=e10]: Enter your email address to get started.
+    - generic [ref=e11]:
+      - generic [ref=e13]:
+        - generic [ref=e14]:
+          - generic [ref=e16]:
+            - textbox "Email or mobile number" [ref=e17]
+            - generic: Email or mobile number
+          - link "Forgot email?" [ref=e18] [cursor=pointer]:
+            - /url: /authflow/email-recovery/?contextId=31996971CF7597214&redirectUri=%252Fsignin%253Fintent%253Dcheckout%2526ctxId%253Dxo_ctx_31996971CF7597214%2526returnUri%253D%25252Fwebapps%25252Fhermes%2526state%253D%25253Fflow%25253D1-P%252526ulReturn%25253Dtrue%252526token%25253D31996971CF7597214%252526ssrt%25253D1794465684042%252526rcache%25253D1%252526useraction%25253DCONTINUE%252526cookieBannerVariant%25253Dhidden%2526locale.x%253Den_IN%2526country.x%253DIN%2526flowId%253D31996971CF7597214%2526sso%253Dtrue
+        - button "Next" [ref=e20] [cursor=pointer]
+      - generic [ref=e21]:
+        - generic [ref=e22]: or
+        - button "Pay with Credit or Debit Card" [ref=e23] [cursor=pointer]
+      - generic [ref=e25]:
+        - list
+  - contentinfo [ref=e26]:
+    - list [ref=e28]:
+      - listitem [ref=e29]:
+        - link "Contact Us" [ref=e30] [cursor=pointer]:
+          - /url: /in/smarthelp/contact-us
+      - listitem [ref=e31]:
+        - link "Privacy" [ref=e32] [cursor=pointer]:
+          - /url: /in/webapps/mpp/ua/privacy-full
+      - listitem [ref=e33]:
+        - link "Legal" [ref=e34] [cursor=pointer]:
+          - /url: /in/webapps/mpp/ua/legalhub-full
+      - listitem [ref=e35]:
+        - link "Worldwide" [ref=e36] [cursor=pointer]:
+          - /url: /in/webapps/mpp/country-worldwide

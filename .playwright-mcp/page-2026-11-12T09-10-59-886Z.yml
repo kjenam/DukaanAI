@@ -1,0 +1,39 @@
+- main [ref=f33e2]:
+  - generic [ref=f33e6]:
+    - img "PayPal Logo" [ref=f33e8]
+    - heading "Pay with PayPal" [level=1] [ref=f33e9]
+    - paragraph [ref=f33e10]: With a PayPal account, you're eligible for Buyer Protection and Rewards.
+    - generic [ref=f33e11]:
+      - generic [ref=f33e12]:
+        - generic [ref=f33e13]:
+          - generic [ref=f33e16]:
+            - textbox "Email or mobile number" [ref=f33e17]: kumarjenam31@gmail.com
+            - generic: Email or mobile number
+          - generic [ref=f33e18]:
+            - generic [ref=f33e20]:
+              - textbox "Password" [ref=f33e21]
+              - generic: Password
+              - generic: Show password
+              - generic: Hide
+            - link "Forgot password?" [ref=f33e22] [cursor=pointer]:
+              - /url: /authflow/password-recovery/?contextId=31996971CF7597214&redirectUri=%252Fsignin%253Fintent%253Dcheckout%2526ctxId%253Dxo_ctx_31996971CF7597214%2526returnUri%253D%25252Fwebapps%25252Fhermes%2526state%253D%25253Fflow%25253D1-P%252526ulReturn%25253Dtrue%252526token%25253D31996971CF7597214%252526ssrt%25253D1794474657728%252526rcache%25253D1%252526useraction%25253DCONTINUE%252526cookieBannerVariant%25253D1%2526locale.x%253Den_IN%2526country.x%253DIN%2526flowId%253D31996971CF7597214%2526sso%253Dtrue&country.x=IN&locale.x=en_GB&pwrMayflyId=pwr%3A63926dcfd34a451a94ba9246abe046c9
+        - button "Log In" [ref=f33e24] [cursor=pointer]
+      - generic [ref=f33e25]:
+        - generic [ref=f33e26]: or
+        - button "Pay with Credit or Debit Card" [ref=f33e27] [cursor=pointer]
+      - generic [ref=f33e29]:
+        - list
+  - contentinfo [ref=f33e30]:
+    - list [ref=f33e32]:
+      - listitem [ref=f33e33]:
+        - link "Contact Us" [ref=f33e34] [cursor=pointer]:
+          - /url: /in/smarthelp/contact-us
+      - listitem [ref=f33e35]:
+        - link "Privacy" [ref=f33e36] [cursor=pointer]:
+          - /url: /in/webapps/mpp/ua/privacy-full
+      - listitem [ref=f33e37]:
+        - link "Legal" [ref=f33e38] [cursor=pointer]:
+          - /url: /in/webapps/mpp/ua/legalhub-full
+      - listitem [ref=f33e39]:
+        - link "Worldwide" [ref=f33e40] [cursor=pointer]:
+          - /url: /in/webapps/mpp/country-worldwide

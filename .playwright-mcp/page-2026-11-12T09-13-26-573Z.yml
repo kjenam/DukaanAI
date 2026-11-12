@@ -1,0 +1,33 @@
+- generic [ref=e5]:
+  - iframe [ref=e7]:
+    - banner [ref=f2e2]:
+      - generic [ref=f2e3]:
+        - generic [ref=f2e5]:
+          - heading [level=1]
+        - generic [ref=f2e6]:
+          - generic [ref=f2e8]:
+            - link "Gmail" [ref=f2e10] [cursor=pointer]:
+              - /url: https://mail.google.com/mail/?tab=rm&ogbl
+            - link "Search for Images" [ref=f2e12] [cursor=pointer]:
+              - /url: https://www.google.com/imghp?hl=en&tab=ri&ogbl
+              - text: Images
+          - button "Google apps" [ref=f2e17] [cursor=pointer]
+  - generic [ref=e14]:
+    - combobox "Search Google or type a URL" [ref=e16]
+    - generic:
+      - button "Search by voice" [ref=e18] [cursor=pointer]
+      - button "Search by image" [ref=e20] [cursor=pointer]
+  - generic [ref=e22]:
+    - generic "Log in to your PayPal account" [ref=e23] [cursor=pointer]:
+      - link "Log in to your PayPal account" [ref=e24]:
+        - /url: https://www.sandbox.paypal.com/checkoutnow?token=31996971CF7597214
+      - button "More actions for Log in to your PayPal account shortcut" [ref=e25]
+    - generic "Web Store" [ref=e29] [cursor=pointer]:
+      - link "Web Store" [ref=e30]:
+        - /url: https://chrome.google.com/webstore?hl=en
+      - button "More actions for Web Store shortcut" [ref=e31]
+    - button "Add shortcut" [ref=e35] [cursor=pointer]
+    - generic:
+      - generic: Cancel
+      - generic: Done
+  - button "Customize Chrome" [ref=e43] [cursor=pointer]

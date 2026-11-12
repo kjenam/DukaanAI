@@ -281,6 +281,49 @@ def market_news(lang="en"):
     return gemini(prompt, search=True)
 
 
+COLLECTIONS_PROMPT = """You are the collections agent of {shop}, a small kirana (grocery) shop in a Rajasthan village.
+Customers buy on udhaar (credit) and the owner finds it awkward to ask for money. You decide, for each customer
+below, whether to nudge them today and write the message the owner will send. Be warm and respectful; these
+are neighbours, not debtors.
+
+Policy:
+- action "wait": balance under ₹{min_balance}, OR paid something in the last {paid_days} days, OR nudged in the last {nudge_days} days.
+- action "remind": a PayPal invoice is already open (open_invoice=true) -> PayPal re-sends it; write a short friendly follow-up.
+- action "invoice": no open invoice -> a new PayPal invoice with a pay link will be created and your message goes on it.
+- priority 1 = overdue 30+ days or balance ₹3000+, 2 = overdue 14+ days, 3 = otherwise.
+- message: max 2 short lines, address them by first name + "ji", state the amount in ₹ and roughly how long it has
+  been pending, say a PayPal link follows, thank them. {language}. Empty string for "wait".
+- reason: one short line, in English, for the owner.
+
+Customers (JSON): {rows}
+
+Return ONLY a JSON array: [{{"customer_id": int, "action": "invoice"|"remind"|"wait", "priority": 1|2|3,
+"reason": string, "message": string}}]
+"""
+
+
+def collections_plan(rows, lang="en", shop_name="Dukaan Saathi"):
+    """Returns a list of actions, or None when the model is unavailable (caller uses the rule plan)."""
+    if not rows or not available():
+        return None
+    slim = [{k: r[k] for k in ("customer_id", "name", "balance", "days_overdue", "days_since_payment",
+                                "reminders_sent", "days_since_nudge", "invoice_age_days")} | {"open_invoice": bool(r["open_invoice"])}
+            for r in rows]
+    language = ("Write the message in simple Hindi (Devanagari script)" if lang == "hi"
+                else "Write the message in Hinglish (Hindi words in Roman script, like a WhatsApp message)")
+    out = gemini(COLLECTIONS_PROMPT.format(shop=shop_name, min_balance=100, paid_days=7, nudge_days=3,
+                                           language=language, rows=json.dumps(slim, ensure_ascii=False)),
+                 json_mode=True, max_tokens=4096)
+    if not out:
+        return None
+    m = re.search(r"\[.*\]", out, re.S)
+    try:
+        plan = json.loads(m.group(0) if m else out)
+        return plan if isinstance(plan, list) else None
+    except Exception:
+        return None
+
+
 def market_price(item):
     prompt = (f"What is the current typical wholesale and retail price in India (preferably Rajasthan) for "
               f"'{item['name']}' per {item['unit']}? Reply in at most 2 short lines, with rupee ranges and the "

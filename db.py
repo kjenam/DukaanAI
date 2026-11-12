@@ -62,6 +62,17 @@ CREATE TABLE IF NOT EXISTS po_lines (
 CREATE TABLE IF NOT EXISTS insights (
     key TEXT PRIMARY KEY, content TEXT NOT NULL, created_at TEXT NOT NULL
 );
+CREATE TABLE IF NOT EXISTS collection_runs (
+    id INTEGER PRIMARY KEY, created_at TEXT NOT NULL, lang TEXT, source TEXT, summary TEXT
+);
+CREATE TABLE IF NOT EXISTS collection_actions (
+    id INTEGER PRIMARY KEY, run_id INTEGER NOT NULL, customer_id INTEGER NOT NULL,
+    balance REAL NOT NULL, days_overdue INTEGER, priority INTEGER NOT NULL DEFAULT 2,
+    action TEXT NOT NULL CHECK (action IN ('invoice','remind','wait')),
+    reason TEXT, message TEXT,
+    status TEXT NOT NULL DEFAULT 'proposed' CHECK (status IN ('proposed','sent','skipped','failed')),
+    invoice_id INTEGER, pay_url TEXT, error TEXT, created_at TEXT NOT NULL, sent_at TEXT
+);
 """
 
 SUPPLIERS = [

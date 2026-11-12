@@ -8,6 +8,7 @@ from flask import Flask, g, jsonify, render_template, request
 load_dotenv()
 
 import ai  # noqa: E402  (needs env loaded first)
+import vasooli as coll  # noqa: E402  (the collections agent)
 import db  # noqa: E402
 import paypal  # noqa: E402
 
@@ -346,28 +347,42 @@ def customer_update(cid):
     return jsonify({"ok": True})
 
 
-@app.post("/api/customers/<int:cid>/invoice")
-def send_invoice(cid):
+class InvoiceRefused(ValueError):
+    """Business-rule refusal (no balance, invoice already open): a 400, not a PayPal failure."""
+
+
+def issue_invoice(cid, note=None):
+    """Create + send a PayPal invoice for a customer's whole udhaar balance. Returns the local invoice row."""
     cust = db.one(conn(), "SELECT * FROM customers WHERE id=?", (cid,))
     if not cust:
-        return err("Unknown customer", 404)
+        raise InvoiceRefused("Unknown customer")
     bal = db.balance(conn(), cid)
     if bal <= 0:
-        return err("No udhaar balance to invoice")
+        raise InvoiceRefused("No udhaar balance to invoice")
     open_inv = db.one(conn(), "SELECT * FROM invoices WHERE customer_id=? AND status NOT IN ('PAID','MARKED_AS_PAID','CANCELLED')", (cid,))
     if open_inv:
-        return err("This customer already has an open invoice. Sync it or record a payment first.")
+        raise InvoiceRefused("This customer already has an open invoice. Sync it or record a payment first.")
     lines = db.rows(conn(), """SELECT i.name || ' x' || bl.qty AS name FROM khata_entries k
                                JOIN bill_lines bl ON bl.bill_id=k.bill_id JOIN items i ON i.id=bl.item_id
                                WHERE k.customer_id=? AND k.kind='credit' ORDER BY k.created_at DESC LIMIT 15""", (cid,))
     email = cust.get("email") or os.environ.get("PAYPAL_DEMO_BUYER_EMAIL") or None
-    res = paypal.create_and_send_invoice(cust["name"], lines, bal, email, SHOP_NAME)
+    res = paypal.create_and_send_invoice(cust["name"], lines, bal, email, SHOP_NAME, note=note)
     now = db.now_iso()
     iid = conn().execute("""INSERT INTO invoices (customer_id, paypal_id, amount_inr, amount_usd, status, pay_url, created_at, updated_at)
                             VALUES (?,?,?,?,?,?,?,?)""",
                          (cid, res["paypal_id"], bal, res["amount_usd"], res["status"], res.get("pay_url"), now, now)).lastrowid
     conn().commit()
-    return jsonify(db.one(conn(), "SELECT * FROM invoices WHERE id=?", (iid,)))
+    row = db.one(conn(), "SELECT * FROM invoices WHERE id=?", (iid,))
+    row["delivery"] = res.get("delivery", "email")
+    return row
+
+
+@app.post("/api/customers/<int:cid>/invoice")
+def send_invoice(cid):
+    try:
+        return jsonify(issue_invoice(cid))
+    except InvoiceRefused as e:
+        return err(str(e), 404 if "Unknown" in str(e) else 400)
 
 
 def _apply_invoice_status(inv, info):
@@ -501,6 +516,121 @@ def po_cancel(pid):
     return jsonify({"ok": True})
 
 
+# ---------------------------------------------------------------- AI collections agent (vasooli)
+
+def action_view(a):
+    """Action row + customer details + WhatsApp link, as the UI needs it."""
+    c = db.one(conn(), "SELECT name, phone, email FROM customers WHERE id=?", (a["customer_id"],)) or {}
+    a["customer"] = c.get("name")
+    a["phone"] = c.get("phone")
+    a["wa_link"] = coll.wa_link(c.get("phone"), a.get("message") or "", a.get("pay_url")) if a.get("message") else None
+    return a
+
+
+def run_view(run_id):
+    run = db.one(conn(), "SELECT * FROM collection_runs WHERE id=?", (run_id,))
+    if run:
+        run["actions"] = [action_view(a) for a in db.rows(
+            conn(), "SELECT * FROM collection_actions WHERE run_id=? ORDER BY priority, balance DESC", (run_id,))]
+    return run
+
+
+@app.get("/api/collections")
+def collections_latest():
+    last = db.one(conn(), "SELECT id FROM collection_runs ORDER BY id DESC LIMIT 1")
+    history = db.rows(conn(), """SELECT r.id, r.created_at, r.source, r.summary,
+                                        SUM(a.status='sent') AS sent, COUNT(a.id) AS total
+                                 FROM collection_runs r LEFT JOIN collection_actions a ON a.run_id=r.id
+                                 GROUP BY r.id ORDER BY r.id DESC LIMIT 6""")
+    return jsonify({"run": run_view(last["id"]) if last else None, "history": history,
+                    "candidates": len(coll.customer_rows(conn()))})
+
+
+@app.post("/api/collections/plan")
+def collections_plan():
+    """The agent looks at every open khata and proposes one action per customer. Nothing is sent yet."""
+    lang = (request.get_json(silent=True) or {}).get("lang", "en")
+    rows = coll.customer_rows(conn())
+    if not rows:
+        return jsonify({"run": None, "message": "No udhaar outstanding. Nothing to collect."})
+    ai_plan = ai.collections_plan(rows, lang, SHOP_NAME)
+    source = "gemini" if ai_plan else "rules"
+    plan = coll.merge_ai_plan(rows, ai_plan, lang, SHOP_NAME)
+    by_id = {r["customer_id"]: r for r in rows}
+    n_act = sum(1 for p in plan if p["action"] != "wait")
+    total = sum(by_id[p["customer_id"]]["balance"] for p in plan if p["action"] != "wait")
+    now = db.now_iso()
+    c = conn()
+    # drop any stale proposals from earlier runs so the owner sees one clean to-do list
+    c.execute("UPDATE collection_actions SET status='skipped' WHERE status='proposed'")
+    rid = c.execute("INSERT INTO collection_runs (created_at, lang, source, summary) VALUES (?,?,?,?)",
+                    (now, lang, source, f"{n_act} of {len(plan)} customers to nudge, ₹{total:,.0f} outstanding")).lastrowid
+    for p in plan:
+        r = by_id[p["customer_id"]]
+        c.execute("""INSERT INTO collection_actions (run_id, customer_id, balance, days_overdue, priority, action, reason,
+                     message, status, created_at) VALUES (?,?,?,?,?,?,?,?,?,?)""",
+                  (rid, p["customer_id"], r["balance"], r["days_overdue"], p["priority"], p["action"], p["reason"],
+                   p["message"], "proposed" if p["action"] != "wait" else "skipped", now))
+    c.commit()
+    return jsonify({"run": run_view(rid)})
+
+
+def execute_action(a, message=None):
+    """Carry out one approved action through PayPal. Returns the updated action row."""
+    c = conn()
+    msg = (message if message is not None else a["message"]) or ""
+    try:
+        if a["action"] == "invoice":
+            inv = issue_invoice(a["customer_id"], note=msg)
+            c.execute("UPDATE collection_actions SET status='sent', message=?, invoice_id=?, pay_url=?, sent_at=?, error=NULL WHERE id=?",
+                      (msg, inv["id"], inv.get("pay_url"), db.now_iso(), a["id"]))
+        elif a["action"] == "remind":
+            inv = db.one(c, "SELECT * FROM invoices WHERE customer_id=? AND status NOT IN ('PAID','MARKED_AS_PAID','CANCELLED') ORDER BY id DESC LIMIT 1",
+                         (a["customer_id"],))
+            if not inv:
+                raise InvoiceRefused("No open PayPal invoice to remind about; run the agent again.")
+            info = paypal.remind_invoice(inv["paypal_id"])
+            c.execute("UPDATE invoices SET status=?, updated_at=? WHERE id=?", (info["status"], db.now_iso(), inv["id"]))
+            c.execute("UPDATE collection_actions SET status='sent', message=?, invoice_id=?, pay_url=?, sent_at=?, error=NULL WHERE id=?",
+                      (msg, inv["id"], inv.get("pay_url"), db.now_iso(), a["id"]))
+        else:
+            raise InvoiceRefused("Nothing to send for a 'wait' action")
+        c.commit()
+    except (paypal.PayPalError, InvoiceRefused) as e:
+        c.execute("UPDATE collection_actions SET status='failed', error=? WHERE id=?", (str(e)[:400], a["id"]))
+        c.commit()
+    return action_view(db.one(c, "SELECT * FROM collection_actions WHERE id=?", (a["id"],)))
+
+
+@app.post("/api/collections/<int:aid>/approve")
+def collections_approve(aid):
+    a = db.one(conn(), "SELECT * FROM collection_actions WHERE id=?", (aid,))
+    if not a:
+        return err("Unknown action", 404)
+    if a["status"] == "sent":
+        return jsonify(action_view(a))
+    out = execute_action(a, (request.get_json(silent=True) or {}).get("message"))
+    return (jsonify(out), 502) if out["status"] == "failed" else jsonify(out)
+
+
+@app.post("/api/collections/approve-all")
+def collections_approve_all():
+    last = db.one(conn(), "SELECT id FROM collection_runs ORDER BY id DESC LIMIT 1")
+    if not last:
+        return err("Run the agent first")
+    results = [execute_action(a) for a in db.rows(
+        conn(), "SELECT * FROM collection_actions WHERE run_id=? AND status='proposed' ORDER BY priority", (last["id"],))]
+    return jsonify({"results": results, "sent": sum(r["status"] == "sent" for r in results),
+                    "failed": sum(r["status"] == "failed" for r in results), "run": run_view(last["id"])})
+
+
+@app.post("/api/collections/<int:aid>/skip")
+def collections_skip(aid):
+    conn().execute("UPDATE collection_actions SET status='skipped' WHERE id=? AND status IN ('proposed','failed')", (aid,))
+    conn().commit()
+    return jsonify(action_view(db.one(conn(), "SELECT * FROM collection_actions WHERE id=?", (aid,))))
+
+
 # ---------------------------------------------------------------- insights
 
 @app.post("/api/chat")
@@ -510,6 +640,22 @@ def chat():
     if not q:
         return err("Ask a question")
     return jsonify({"answer": ai.answer_question(q, shop_context(), data.get("lang", "en")) or fallback_answer(q)})
+
+
+@app.get("/api/insights/series")
+def sales_series():
+    """Per-day totals for the last N days: cash+udhaar sales, udhaar given, udhaar collected (for the dashboard chart)."""
+    days = min(int(request.args.get("days", 14)), 90)
+    start = (db.now() - timedelta(days=days - 1)).date()
+    c = conn()
+    sales = {r["d"]: r["s"] for r in db.rows(c, "SELECT substr(created_at,1,10) d, SUM(total) s FROM bills WHERE created_at >= ? GROUP BY d", (start.isoformat(),))}
+    credit = {r["d"]: r["s"] for r in db.rows(c, "SELECT substr(created_at,1,10) d, SUM(amount) s FROM khata_entries WHERE kind='credit' AND created_at >= ? GROUP BY d", (start.isoformat(),))}
+    paid = {r["d"]: r["s"] for r in db.rows(c, "SELECT substr(created_at,1,10) d, SUM(amount) s FROM khata_entries WHERE kind='payment' AND created_at >= ? GROUP BY d", (start.isoformat(),))}
+    out = []
+    for i in range(days):
+        d = (start + timedelta(days=i)).isoformat()
+        out.append({"date": d, "sales": round(sales.get(d, 0), 2), "udhaar": round(credit.get(d, 0), 2), "collected": round(paid.get(d, 0), 2)})
+    return jsonify(out)
 
 
 @app.get("/api/insights/deadstock")

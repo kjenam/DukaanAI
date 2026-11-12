@@ -1,4 +1,4 @@
-# दुकान साथी · Dukaan Saathi
+# Dukaan Saathi
 
 **An AI shop assistant for village kirana stores, with PayPal doing the money.**
 Built for the PayPal AI Hackathon 2026 by a team from a small village in Rajasthan, for our own family's grocery shop.

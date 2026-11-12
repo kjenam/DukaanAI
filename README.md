@@ -9,7 +9,10 @@ decides who to nudge for udhaar, writes a polite message, and uses **PayPal Invo
 low, a **reorder agent** drafts supplier orders that the owner pays with **PayPal Orders**. The owner approves every
 rupee that moves.
 
-> Live demo: `https://<your-service>.onrender.com` · Video: `<youtube link>` · Devpost: `<link>`
+> Demo video: `<youtube link>` · Devpost: `<link>` · **Run it locally in 5 minutes** (below). There is no hosted
+> instance; the app runs on your machine against the free PayPal sandbox and a free Gemini key.
+> **It also starts with no keys at all**: billing uses the built-in offline parser, the collections agent uses its
+> rule planner, and PayPal buttons show a "add keys" note, so you can explore the whole UI immediately.
 
 ## What it does
 
@@ -45,31 +48,36 @@ Browser (phone or desktop)                Flask (app.py)                      Ex
 
 ## Run it locally (5 minutes)
 
+Requirements: Python 3.10+ (tested on 3.12 and 3.14), Chrome for voice input. Works on Windows, macOS and Linux.
+
 ```powershell
-git clone <repo> && cd DukaanAi
-python -m venv .venv && .venv\Scripts\activate        # macOS/Linux: source .venv/bin/activate
+git clone <repo-url> dukaan-saathi
+cd dukaan-saathi
+python -m venv .venv
+.venv\Scripts\activate                                  # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-copy .env.example .env                                 # then paste your keys (see below)
-python app.py                                          # http://localhost:5000
+copy .env.example .env                                  # macOS/Linux: cp .env.example .env   (then paste keys, optional)
+python app.py
 ```
-Voice input needs Chrome on `localhost` or HTTPS. **Insights → Reset demo data** restores the seed any time.
+Open **http://localhost:5000**. The first start creates `dukaan.db` with ~40 kirana items, 6 customers and 45 days of
+bills and udhaar. **Insights → Reset demo data** restores that seed any time. Voice input works in Chrome on `localhost`.
 
-### Keys
-1. **Gemini**: free key from https://aistudio.google.com/apikey → `GEMINI_API_KEY`.
-2. **PayPal sandbox**: developer.paypal.com → Apps & Credentials → Sandbox → your app → `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`.
-3. **Sandbox buyer**: developer.paypal.com → Testing Tools → Sandbox Accounts → create a **Personal** account with
-   **Country = United States** → its email goes in `PAYPAL_DEMO_BUYER_EMAIL`. (PayPal does not allow India-to-India
-   invoices or payments, so the buyer must be outside India; the app still issues a pay *link* if sending fails.)
+### Keys (all free; the app runs without them, with AI and PayPal features in offline mode)
+1. **Gemini**: https://aistudio.google.com/apikey → `GEMINI_API_KEY` in `.env`. Enables the Hindi/Hinglish voice parser,
+   the collections agent's reasoning and messages, deadstock tips, market news and "ask your shop".
+2. **PayPal sandbox**: https://developer.paypal.com → Apps & Credentials → **Sandbox** → Create app → copy **Client ID**
+   and **Secret** → `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET`. Enables invoices, reminders, record-cash and supplier
+   payments. All transactions are sandbox-only; no real money moves.
+3. **Sandbox buyer** (to pay invoices and approve supplier orders): developer.paypal.com → Testing Tools → Sandbox
+   Accounts → **Create account** → Personal, **Country = United States** → its email goes in `PAYPAL_DEMO_BUYER_EMAIL`,
+   and you log in to sandbox.paypal.com with it when a pay page opens. PayPal does not allow India-to-India invoices or
+   payments, so the buyer must be outside India; if email delivery is refused the app still issues a pay *link*.
 
-## Deploy on Render (free)
-
-Push to GitHub → Render → New → **Blueprint** → pick the repo (`render.yaml` is read) → add the three keys and the buyer
-email as environment variables. The free tier sleeps after inactivity (first load 30–50 s) and the SQLite file resets on
-redeploy; the seed data reloads automatically.
+Optional: `render.yaml` deploys the same app on Render's free tier (Blueprint) if you want a hosted copy.
 
 ## For judges: test it in 4 minutes
 
-You need the sandbox buyer login (in the Devpost "testing instructions"): `sb-....@personal.example.com` / password.
+With the three keys above in `.env` (the Devpost testing instructions also include a ready-made US sandbox buyer login).
 
 1. **Bill by voice or text** (Bill tab): click the chip *"Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar"* → preview in ~2 s
    (shows which model understood it and how fast) → **Save bill**. Udhaar outstanding goes up.

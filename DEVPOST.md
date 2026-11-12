@@ -71,6 +71,13 @@ Community, Chart.js, Web Speech API, Render.
 
 ## Testing instructions for judges
 
-Live URL: `<render url>` (free tier: first load may take 30–50 s). Sandbox buyer for paying invoices and approving
-supplier orders: `sb-suh9453880126@personal.example.com` / `<password>`. Full 4-minute walkthrough is in the README
-under "For judges".
+The project runs locally in 5 minutes; the README "Run it locally" section has the exact commands (clone, venv,
+`pip install -r requirements.txt`, `python app.py`, open http://localhost:5000). It starts with **no keys at all** in
+offline mode (rule-based parser, rule-based collections planner, PayPal disabled) so the UI and data model can be
+explored immediately. For the full experience add to `.env`: a free Gemini key (aistudio.google.com/apikey) and your
+PayPal **sandbox** app's Client ID and Secret (developer.paypal.com → Apps & Credentials → Sandbox).
+
+Sandbox buyer for paying invoices and approving supplier orders: `sb-suh9453880126@personal.example.com` /
+`<password>` (a US sandbox personal account; PayPal blocks India-to-India payments). Put that email in
+`PAYPAL_DEMO_BUYER_EMAIL`. The 4-minute judge walkthrough is in the README under "For judges", and the demo video
+shows every flow end to end against real sandbox transactions.

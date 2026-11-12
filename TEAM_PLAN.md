@@ -12,16 +12,17 @@ link), new responsive UI (phone tabs + desktop AG Grid dashboard + chart), READM
 
 | Person A (owner of the repo) | Person B |
 |---|---|
-| Push `DukaanAi` to a public GitHub repo, deploy on Render via Blueprint, add env vars (Gemini key, PayPal client id/secret, `PAYPAL_DEMO_BUYER_EMAIL` = the US sandbox buyer) | Read `DEMO_SCRIPT.md`; log in to sandbox.paypal.com as the US buyer in a second tab; warm up the Render URL |
-| On the live URL: Insights → Reset demo data, run the 5 judge steps from the README once | Record the 3-minute video on the live URL (desktop + phone/device mode), upload to YouTube (unlisted is fine) |
-| Fill the Devpost form from `DEVPOST.md`: description, tools, repo link, live URL, video link, testing instructions with the sandbox buyer email + password | Send the video link to A by 10:30 PM |
+| Push `DukaanAi` to a **public** GitHub repo (LICENSE is in the root; check it shows in the About panel) | Read `DEMO_SCRIPT.md`; run the app locally with keys; log in to sandbox.paypal.com as the US buyer in a second tab |
+| Fresh clone on another folder: follow the README commands exactly, confirm it runs with and without keys | Record the 3-minute video locally (desktop + phone/device mode), upload to YouTube as **Public**, under 3:00 |
+| Fill the Devpost form from `DEVPOST.md`: description, tools, repo link, video link, testing instructions with the sandbox buyer email + password | Send the video link to A by 10:30 PM |
 | Final check: repo public, no `.env` committed, README links filled in | Watch the submission confirmation arrive |
 
 ## Submission checklist
 
-- [ ] Live Render URL works on a phone and a laptop (warm it up before judging)
+- [ ] README run instructions verified on a fresh clone (with keys and without)
+- [ ] LICENSE file visible at the repo root / About panel
 - [ ] GitHub repo public, README up to date, **no `.env` committed** (`git ls-files | grep .env` shows only `.env.example`)
-- [ ] Video ≤ 3 min shows: voice bill → collections agent → PayPal invoice paid → reorder paid with PayPal → dashboard
+- [ ] Video ≤ 3 min, **public** on YouTube, no music, shows: voice bill → collections agent → PayPal invoice paid → reorder paid with PayPal → dashboard
 - [ ] Devpost "Built with": Python, Flask, SQLite, Gemini API, PayPal Invoicing API, PayPal Orders API, PayPal JS SDK, AG Grid, Chart.js, Web Speech API, Render
 - [ ] Testing instructions include the sandbox buyer email/password
 - [ ] Both team members added on Devpost

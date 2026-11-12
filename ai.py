@@ -56,8 +56,8 @@ def gemini(prompt, json_mode=False, search=False, fast=False, max_tokens=None):
                 # model does not accept thinkingLevel: retry once without it
                 body["generationConfig"] = {k: v for k, v in gen.items() if k != "thinkingConfig"}
                 r = _post(model, body, timeout)
-            if r.status_code == 400 and search:
-                # grounding may not be enabled on every key: retry plain
+            if r.status_code in (400, 429) and "tools" in body:
+                # grounding may be unsupported or over quota on this key: retry plain (no web search)
                 body.pop("tools", None)
                 r = _post(model, body, timeout)
             if r.status_code in (404, 429, 503):

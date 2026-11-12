@@ -181,6 +181,8 @@ def state():
         "low_stock": low_stock(), "deadstock": deadstock(),
         "today": {"sales": t["s"], "bills": t["n"]},
         "udhaar_total": round(sum(x["balance"] for x in customers if x["balance"] > 0), 2),
+        "paypal_collected": db.one(c, "SELECT COALESCE(SUM(amount_inr),0) s FROM invoices WHERE status IN ('PAID','MARKED_AS_PAID')")["s"],
+        "to_approve": db.one(c, "SELECT COUNT(*) n FROM collection_actions WHERE status='proposed'")["n"],
         "recent_bills": recent,
         "pos": db.rows(c, """SELECT p.*, s.name AS supplier FROM purchase_orders p JOIN suppliers s ON s.id=p.supplier_id
                              WHERE p.status IN ('draft','paid') ORDER BY p.id DESC LIMIT 10"""),

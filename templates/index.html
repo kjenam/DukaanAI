@@ -3,137 +3,199 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#0f5132">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛒</text></svg>">
+  <meta name="theme-color" content="#001c64">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23001c64%22/><text x=%2250%22 y=%2268%22 font-size=%2254%22 text-anchor=%22middle%22>🛒</text></svg>">
   <title>Dukaan Saathi · {{ shop_name }}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if paypal_client_id %}
   <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&intent=capture&components=buttons" data-namespace="paypal"></script>
   {% endif %}
 </head>
 <body>
-<header class="top">
-  <div>
-    <div class="brand">दुकान साथी <span>Dukaan Saathi</span></div>
-    <div class="shop">{{ shop_name }}</div>
+<div class="app">
+  <aside class="side">
+    <div class="brand">दुकान साथी<small>Dukaan Saathi · AI + PayPal for kirana shops</small></div>
+    <nav class="tabs">
+      <button data-tab="bill" class="active"><span class="ic">🧾</span><span data-i18n="tabBill">Bill</span></button>
+      <button data-tab="khata"><span class="ic">📒</span><span data-i18n="tabKhata">Khata</span></button>
+      <button data-tab="collect"><span class="ic">🤝</span><span data-i18n="tabCollect">Collect</span><span class="pill hidden" id="collectPill">0</span></button>
+      <button data-tab="stock"><span class="ic">📦</span><span data-i18n="tabStock">Stock</span></button>
+      <button data-tab="reorder"><span class="ic">🚚</span><span data-i18n="tabReorder">Reorder</span></button>
+      <button data-tab="insights"><span class="ic">📊</span><span data-i18n="tabInsights">Insights</span></button>
+    </nav>
+    <div class="side-foot">
+      <button id="langBtn2" class="chip small light" aria-label="Switch language">हिंदी / English</button>
+      <div id="sysInfo2"></div>
+    </div>
+  </aside>
+
+  <div class="main">
+    <header class="top">
+      <div class="top-row">
+        <div>
+          <div class="brand-m">दुकान साथी <span>Dukaan Saathi</span></div>
+          <div class="shop">{{ shop_name }}</div>
+          <div class="small muted" id="topDate"></div>
+        </div>
+        <button id="langBtn" class="chip small light" aria-label="Switch language">हिं / EN</button>
+      </div>
+      <section class="stats">
+        <div class="stat"><div class="k" data-i18n="todaySales">Today's sales</div><div class="v" id="statSales">₹0</div></div>
+        <div class="stat"><div class="k" data-i18n="udhaarTotal">Udhaar outstanding</div><div class="v" id="statUdhaar">₹0</div></div>
+        <div class="stat pp"><div class="k" data-i18n="ppCollected">Collected via PayPal</div><div class="v" id="statPP">₹0</div></div>
+        <div class="stat warn" id="statLowWrap"><div class="k" data-i18n="lowStock">Low stock items</div><div class="v" id="statLow">0</div></div>
+      </section>
+    </header>
+
+    <div id="statusBar" class="status hidden"></div>
+
+    <main>
+      <!-- BILL -->
+      <section class="tab active" id="tab-bill">
+        <div class="cols wide-left">
+          <div>
+            <div class="card hero">
+              <label class="lbl" for="cmd" data-i18n="speakOrType">Speak or type (Hindi / Hinglish / English)</label>
+              <div class="cmd-row">
+                <button id="micBtn" class="mic" aria-label="Start voice input"><span class="dot"></span><span id="micLang">हिं</span></button>
+                <textarea id="cmd" rows="2" placeholder="Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar me likho"></textarea>
+              </div>
+              <div class="row gap">
+                <button id="micLangBtn" class="chip small" data-i18n="micLang">Mic: Hindi</button>
+                <button id="goBtn" class="btn primary grow" data-i18n="go">Go</button>
+              </div>
+              <div class="examples">
+                <span class="ex">Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar</span>
+                <span class="ex">3 Parle-G, 2 Maggi, ek Surf Excel</span>
+                <span class="ex">Meena Devi ne 500 rupaye jama kiye</span>
+                <span class="ex">cheeni ab 46 rupaye kilo</span>
+                <span class="ex">50 kilo cheeni aayi</span>
+                <span class="ex">sabse zyada udhaar kiska hai?</span>
+              </div>
+            </div>
+            <div id="preview"></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="recentBills">Recent bills</h3>
+            <div id="recentBills" class="list"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- KHATA -->
+      <section class="tab" id="tab-khata">
+        <div class="cols">
+          <div class="card">
+            <div class="row between wrap gap"><h3 data-i18n="khata">Khata (udhaar)</h3><button class="btn sm navy" onclick="goTab('collect')">🤝 <span data-i18n="runAgentShort">Collections agent</span></button></div>
+            <input id="custSearch" class="input" placeholder="Search customer…">
+            <div id="custList" class="list list-only"></div>
+            <div id="custGrid" class="grid grid-only" style="margin-top:10px;height:420px"></div>
+          </div>
+          <div id="custDetail"></div>
+        </div>
+      </section>
+
+      <!-- COLLECTIONS AGENT -->
+      <section class="tab" id="tab-collect">
+        <div class="cols wide-left">
+          <div>
+            <div class="card hero">
+              <div class="agent-head">
+                <div class="agent-icon">🤝</div>
+                <div class="grow">
+                  <h3 style="margin:0" data-i18n="collectTitle">AI collections agent · वसूली</h3>
+                  <p class="muted small" style="margin:4px 0 0" data-i18n="collectHelp">Reads every open khata, decides who to nudge today, writes a polite message, and uses PayPal invoices and reminders. Nothing is sent until you approve.</p>
+                </div>
+              </div>
+              <div class="row gap wrap" style="margin-top:14px">
+                <button id="collectRun" class="btn primary" data-i18n="runAgent">Run collections agent</button>
+                <button id="collectAll" class="btn gold hidden" data-i18n="approveAll">Approve all & send</button>
+                <span id="collectSummary" class="small muted"></span>
+              </div>
+            </div>
+            <div id="collectBox"></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="history">Past runs</h3>
+            <div id="collectHistory" class="log list"></div>
+            <p class="small muted" data-i18n="collectNote">PayPal reminder emails use PayPal's standard text. The AI message appears on new invoices and in the WhatsApp link.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- STOCK -->
+      <section class="tab" id="tab-stock">
+        <div class="cols">
+          <div class="card">
+            <h3 data-i18n="lowStockAlerts">Low stock alerts</h3>
+            <div id="lowList" class="list"></div>
+          </div>
+          <div class="card">
+            <div class="row between"><h3 data-i18n="deadstock">Deadstock</h3><button class="chip small" id="deadRefresh" data-i18n="aiTips">✨ AI tips</button></div>
+            <div id="deadList" class="list"></div>
+            <div id="deadAdvice" class="ai-box hidden"></div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="row between wrap gap"><h3 data-i18n="allItems">All items & prices</h3><span class="small muted grid-only" data-i18n="gridHint">Double-click price, stock or alert level to edit</span></div>
+          <input id="itemSearch" class="input" placeholder="Search item…">
+          <div id="itemList" class="list list-only"></div>
+          <div id="itemGrid" class="grid grid-only" style="margin-top:10px"></div>
+        </div>
+      </section>
+
+      <!-- REORDER -->
+      <section class="tab" id="tab-reorder">
+        <div class="card hero">
+          <h3 data-i18n="reorderTitle">Smart reorder (AI agent)</h3>
+          <p class="muted" data-i18n="reorderHelp">The agent checks low stock and recent sales, drafts an order per supplier, and pays through PayPal only after you approve.</p>
+          <button id="suggestBtn" class="btn primary" data-i18n="checkStock">Check stock & draft orders</button>
+        </div>
+        <div id="poList" class="cols"></div>
+      </section>
+
+      <!-- INSIGHTS -->
+      <section class="tab" id="tab-insights">
+        <div class="cols">
+          <div class="card">
+            <h3 data-i18n="trend">Last 14 days<span class="sub" data-i18n="trendSub">sales · udhaar given · collected</span></h3>
+            <div class="chart-wrap"><canvas id="salesChart"></canvas></div>
+          </div>
+          <div class="card">
+            <h3 data-i18n="askShop">Ask your shop</h3>
+            <div class="row gap">
+              <input id="chatQ" class="input grow" placeholder="Who owes the most? What sold most this week?">
+              <button id="chatBtn" class="btn primary" data-i18n="ask">Ask</button>
+            </div>
+            <div class="examples">
+              <span class="exq">Who owes me the most?</span>
+              <span class="exq">Top 5 items this week by profit?</span>
+              <span class="exq">इस हफ्ते कितनी बिक्री हुई?</span>
+            </div>
+            <div id="chatA" class="ai-box hidden"></div>
+          </div>
+        </div>
+        <div class="cols">
+          <div class="card">
+            <div class="row between"><h3 data-i18n="marketNews">Market news</h3><button class="chip small" id="newsRefresh" data-i18n="refresh">Refresh</button></div>
+            <div id="news" class="ai-box muted">…</div>
+          </div>
+          <div class="card">
+            <div class="row between">
+              <h3 data-i18n="demo">Demo tools</h3>
+              <button class="chip small" id="resetBtn" data-i18n="resetDemo">Reset demo data</button>
+            </div>
+            <p class="muted small" id="sysInfo"></p>
+          </div>
+        </div>
+      </section>
+    </main>
   </div>
-  <div class="top-actions">
-    <button id="langBtn" class="chip" aria-label="Switch language">हिं / EN</button>
-  </div>
-</header>
+</div>
 
-<section class="stats">
-  <div class="stat"><div class="k" data-i18n="todaySales">Today's sales</div><div class="v" id="statSales">₹0</div></div>
-  <div class="stat"><div class="k" data-i18n="udhaarTotal">Total udhaar</div><div class="v" id="statUdhaar">₹0</div></div>
-  <div class="stat warn" id="statLowWrap"><div class="k" data-i18n="lowStock">Low stock</div><div class="v" id="statLow">0</div></div>
-</section>
-
-<div id="statusBar" class="status hidden"></div>
-
-<main>
-  <!-- BILL -->
-  <section class="tab active" id="tab-bill">
-    <div class="card command">
-      <label class="lbl" for="cmd" data-i18n="speakOrType">Speak or type (Hindi / Hinglish / English)</label>
-      <div class="cmd-row">
-        <button id="micBtn" class="mic" aria-label="Start voice input"><span class="dot"></span><span id="micLang">हिं</span></button>
-        <textarea id="cmd" rows="2" placeholder="Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar me likho"></textarea>
-      </div>
-      <div class="row gap">
-        <button id="micLangBtn" class="chip small" data-i18n="micLang">Mic: Hindi</button>
-        <button id="goBtn" class="btn primary grow" data-i18n="go">Go</button>
-      </div>
-      <div class="examples">
-        <span class="ex">Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar</span>
-        <span class="ex">3 Parle-G, 2 Maggi, ek Surf Excel</span>
-        <span class="ex">Meena Devi ne 500 rupaye jama kiye</span>
-        <span class="ex">cheeni ab 46 rupaye kilo</span>
-        <span class="ex">50 kilo cheeni aayi</span>
-        <span class="ex">sabse zyada udhaar kiska hai?</span>
-      </div>
-    </div>
-    <div id="preview"></div>
-    <div class="card">
-      <h3 data-i18n="recentBills">Recent bills</h3>
-      <div id="recentBills" class="list"></div>
-    </div>
-  </section>
-
-  <!-- KHATA -->
-  <section class="tab" id="tab-khata">
-    <div class="card">
-      <h3 data-i18n="khata">Khata (udhaar)</h3>
-      <input id="custSearch" class="input" placeholder="Search customer…">
-      <div id="custList" class="list"></div>
-    </div>
-    <div id="custDetail"></div>
-  </section>
-
-  <!-- STOCK -->
-  <section class="tab" id="tab-stock">
-    <div class="card">
-      <h3 data-i18n="lowStockAlerts">Low stock alerts</h3>
-      <div id="lowList" class="list"></div>
-    </div>
-    <div class="card">
-      <div class="row between"><h3 data-i18n="deadstock">Deadstock</h3><button class="chip small" id="deadRefresh" data-i18n="aiTips">AI tips</button></div>
-      <div id="deadList" class="list"></div>
-      <div id="deadAdvice" class="ai-box hidden"></div>
-    </div>
-    <div class="card">
-      <h3 data-i18n="allItems">All items & prices</h3>
-      <input id="itemSearch" class="input" placeholder="Search item…">
-      <div id="itemList" class="list"></div>
-    </div>
-  </section>
-
-  <!-- REORDER -->
-  <section class="tab" id="tab-reorder">
-    <div class="card">
-      <h3 data-i18n="reorderTitle">Smart reorder (AI agent)</h3>
-      <p class="muted" data-i18n="reorderHelp">The agent checks low stock and recent sales, drafts an order per supplier, and pays through PayPal only after you approve.</p>
-      <button id="suggestBtn" class="btn primary" data-i18n="checkStock">Check stock & draft orders</button>
-    </div>
-    <div id="poList"></div>
-  </section>
-
-  <!-- INSIGHTS -->
-  <section class="tab" id="tab-insights">
-    <div class="card">
-      <h3 data-i18n="askShop">Ask your shop</h3>
-      <div class="row gap">
-        <input id="chatQ" class="input grow" placeholder="Who owes the most? What sold most this week?">
-        <button id="chatBtn" class="btn primary" data-i18n="ask">Ask</button>
-      </div>
-      <div class="examples">
-        <span class="exq">Who owes me the most?</span>
-        <span class="exq">Top 5 items this week by profit?</span>
-        <span class="exq">इस हफ्ते कितनी बिक्री हुई?</span>
-      </div>
-      <div id="chatA" class="ai-box hidden"></div>
-    </div>
-    <div class="card">
-      <div class="row between"><h3 data-i18n="marketNews">Market news</h3><button class="chip small" id="newsRefresh" data-i18n="refresh">Refresh</button></div>
-      <div id="news" class="ai-box muted">…</div>
-    </div>
-    <div class="card">
-      <div class="row between">
-        <h3 data-i18n="demo">Demo tools</h3>
-        <button class="chip small" id="resetBtn" data-i18n="resetDemo">Reset demo data</button>
-      </div>
-      <p class="muted small" id="sysInfo"></p>
-    </div>
-  </section>
-</main>
-
-<nav class="tabs">
-  <button data-tab="bill" class="active"><span class="ic">🧾</span><span data-i18n="tabBill">Bill</span></button>
-  <button data-tab="khata"><span class="ic">📒</span><span data-i18n="tabKhata">Khata</span></button>
-  <button data-tab="stock"><span class="ic">📦</span><span data-i18n="tabStock">Stock</span></button>
-  <button data-tab="reorder"><span class="ic">🚚</span><span data-i18n="tabReorder">Reorder</span></button>
-  <button data-tab="insights"><span class="ic">💡</span><span data-i18n="tabInsights">Insights</span></button>
-</nav>
-
+<div id="modal" class="modal-bg hidden"></div>
 <div id="toast" class="toast hidden"></div>
 
 <script>

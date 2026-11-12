@@ -5,6 +5,19 @@ const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "
 const rs = (n) => "₹" + Number(n || 0).toLocaleString("en-IN", { maximumFractionDigits: 2 });
 const usd = (n) => "$" + Number(n || 0).toFixed(2);
 const when = (iso) => (iso || "").slice(0, 16).replace("T", " ");
+// Minimal Markdown for AI text: **bold**, bullet lines, paragraphs. Escapes HTML first.
+function md(text) {
+  const lines = esc(text || "").replace(/\*\*(.+?)\*\*/g, "<b>$1</b>").split(/\r?\n/);
+  let html = "", inList = false;
+  for (const raw of lines) {
+    const line = raw.trim();
+    const m = line.match(/^([*\-•]|\d+[.)])\s+(.*)$/);
+    if (m) { if (!inList) { html += "<ul>"; inList = true; } html += `<li>${m[2]}</li>`; continue; }
+    if (inList) { html += "</ul>"; inList = false; }
+    if (line) html += `<p>${line}</p>`;
+  }
+  return html + (inList ? "</ul>" : "");
+}
 
 const LANG = "en";                                   // UI is English-only; the mic still understands Hindi speech
 let MIC_LANG = localStorage.getItem("micLang") || "hi-IN";
@@ -286,7 +299,7 @@ function renderPreview(res) {
   const box = $("#preview");
   const src = `<div class="src">${t("understoodBy")} ${p.source === "gemini" ? "Gemini AI" : "offline parser"}${res.ms ? ` · ${(res.ms / 1000).toFixed(1)} s` : ""}${p.notes ? " · " + esc(p.notes) : ""}</div>`;
   if (res.answer) {
-    box.innerHTML = `<div class="card preview"><h3>💬 ${t("aiAnswer")}</h3><div class="ai-box">${esc(res.answer)}</div>${src}</div>`;
+    box.innerHTML = `<div class="card preview"><h3>💬 ${t("aiAnswer")}</h3><div class="ai-box">${md(res.answer)}</div>${src}</div>`;
     return;
   }
   if (p.intent === "payment") {
@@ -529,13 +542,17 @@ async function loadChart() {
     const [series] = await Promise.all([api("/api/insights/series?days=14"), loadScript(CDN.chart)]);
     const labels = series.map((d) => d.date.slice(5).replace("-", "/"));
     const ds = (label, key, color, fill) => ({ label, data: series.map((d) => d[key]), borderColor: color, backgroundColor: fill || color, tension: .35, borderWidth: 2.5, pointRadius: 2 });
+    Chart.defaults.font.family = "Sora, system-ui, sans-serif";
+    Chart.defaults.color = "#5A584F";
     const cfg = { type: "line", data: { labels, datasets: [
-      ds("Sales", "sales", "#0070e0", "rgba(0,112,224,.12)"),
-      ds("Udhaar given", "udhaar", "#b54708"),
-      ds("Collected", "collected", "#118c4f") ] },
+      ds("Sales", "sales", "#161714", "rgba(255,209,102,.45)"),
+      ds("Udhaar given", "udhaar", "#C8203F"),
+      ds("Collected", "collected", "#06A57C") ] },
       options: { responsive: true, maintainAspectRatio: false, interaction: { mode: "index", intersect: false },
-        plugins: { legend: { position: "bottom", labels: { boxWidth: 12, usePointStyle: true } }, tooltip: { callbacks: { label: (c) => ` ${c.dataset.label}: ${rs(c.parsed.y)}` } } },
-        scales: { y: { beginAtZero: true, ticks: { callback: (v) => "₹" + (v >= 1000 ? (v / 1000) + "k" : v) }, grid: { color: "#eef2f7" } }, x: { grid: { display: false } } } } };
+        plugins: { legend: { position: "bottom", labels: { boxWidth: 12, usePointStyle: true, font: { weight: 600 } } },
+          tooltip: { backgroundColor: "#161714", titleFont: { weight: 700 }, callbacks: { label: (c) => ` ${c.dataset.label}: ${rs(c.parsed.y)}` } } },
+        scales: { y: { beginAtZero: true, ticks: { callback: (v) => "₹" + (v >= 1000 ? (v / 1000) + "k" : v) }, grid: { color: "#EFEBE1" }, border: { display: false } },
+                  x: { grid: { display: false }, border: { color: "#161714", width: 2 } } } } };
     cfg.data.datasets[0].fill = true;
     if (CHART) { CHART.data = cfg.data; CHART.update(); } else CHART = new Chart($("#salesChart"), cfg);
   } catch (e) { toast(e.message, true); }
@@ -545,7 +562,7 @@ async function loadNews(force) {
   $("#news").textContent = "…";
   try {
     const r = await api(`/api/insights/news?lang=${LANG}${force ? "&refresh=1" : ""}`);
-    $("#news").innerHTML = esc(r.content) + (r.at ? `<div class="src">AI summary with web search · ${esc(when(r.at))} · verify before big purchases</div>` : "");
+    $("#news").innerHTML = md(r.content) + (r.at ? `<div class="src">AI summary · ${esc(when(r.at))} · verify before big purchases</div>` : "");
   } catch (e) { $("#news").textContent = e.message; }
 }
 
@@ -554,14 +571,16 @@ async function askShop(q) {
   $("#chatQ").value = q;
   await busy($("#chatBtn"), async () => {
     const r = await api("/api/chat", { q, lang: LANG });
-    $("#chatA").textContent = r.answer;
+    $("#chatA").innerHTML = md(r.answer);
     $("#chatA").classList.remove("hidden");
   });
 }
 
 function goTab(name) {
+  if (!$("#tab-" + name)) name = "home";
   $$(".tabs button").forEach((b) => b.classList.toggle("active", b.dataset.tab === name));
   $$(".tab").forEach((s) => s.classList.toggle("active", s.id === "tab-" + name));
+  if (location.hash !== "#" + name) history.replaceState(null, "", "#" + name);   // deep-linkable tabs
   if (!DESKTOP.matches) window.scrollTo(0, 0);
   if (name === "insights") { if ($("#news").textContent === "…") loadNews(false); loadChart(); }
   if (name === "collect" && !COLLECT) loadCollections().catch((e) => toast(e.message, true));
@@ -584,7 +603,7 @@ document.addEventListener("DOMContentLoaded", async () => {
   $("#collectAll").onclick = approveAll;
   $("#deadRefresh").onclick = () => busy($("#deadRefresh"), async () => {
     const r = await api(`/api/insights/deadstock?lang=${LANG}&refresh=1`);
-    $("#deadAdvice").textContent = r.advice || "Add GEMINI_API_KEY for AI suggestions.";
+    $("#deadAdvice").innerHTML = md(r.advice || "Add GEMINI_API_KEY for AI suggestions.");
     $("#deadAdvice").classList.remove("hidden");
   });
   $("#suggestBtn").onclick = () => busy($("#suggestBtn"), async () => {
@@ -596,6 +615,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     onOk: async () => { await api("/api/reset", {}); location.reload(); } });
   setupMic();
   applyLang();
+  if (location.hash.length > 1) goTab(location.hash.slice(1));
   // desktop: load AG Grid once, then render grids; phone: lists only
   const gridsReady = DESKTOP.matches ? loadScript(CDN.agGrid).then(() => loadScript("/static/grid.js")).catch((e) => console.warn(e)) : Promise.resolve();
   try { await Promise.all([refresh(), gridsReady]); if (DESKTOP.matches) renderAll(); } catch (e) { toast(e.message, true); }

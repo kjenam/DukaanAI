@@ -2,8 +2,11 @@
 (function () {
   const apis = {};
   const theme = () => agGrid.themeQuartz.withParams({
-    accentColor: "#0070e0", browserColorScheme: "light", fontFamily: "Inter, system-ui, sans-serif",
-    headerBackgroundColor: "#f3f6fb", headerFontWeight: 700, borderRadius: 10, wrapperBorderRadius: 12, rowHoverColor: "#e8f3fc",
+    accentColor: "#161714", browserColorScheme: "light", fontFamily: "Sora, system-ui, sans-serif", fontSize: 14,
+    backgroundColor: "#FFFFFF", foregroundColor: "#161714", borderColor: "#D3CEC1", wrapperBorder: false,
+    headerBackgroundColor: "#FFF1C2", headerTextColor: "#161714", headerFontWeight: 800, headerColumnBorder: { color: "#161714", width: 2 },
+    rowBorder: { color: "#EFEBE1", width: 2 }, rowHoverColor: "#FFFBF1", selectedRowBackgroundColor: "#FFF1C2",
+    borderRadius: 8, wrapperBorderRadius: 10, cellHorizontalPadding: 14,
   });
   const inr = (p) => (p.value == null ? "" : "₹" + Number(p.value).toLocaleString("en-IN", { maximumFractionDigits: 2 }));
   const num = (p) => Number(p.newValue);

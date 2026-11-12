@@ -3,11 +3,12 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#001c64">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 rx=%2222%22 fill=%22%23001c64%22/><text x=%2250%22 y=%2268%22 font-size=%2254%22 text-anchor=%22middle%22>🛒</text></svg>">
+  <meta name="theme-color" content="#FFD166">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect x='6' y='6' width='52' height='52' rx='14' fill='%23FFD166' stroke='%23161714' stroke-width='4'/%3E%3Cpath d='M20 22h24M20 32h24M20 42h14' stroke='%23161714' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
   <title>Dukaan Saathi · {{ shop_name }}</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@600;700&display=swap">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700;800&family=Caveat:wght@600;700&display=swap">
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   {% if paypal_client_id %}
   <script src="https://www.paypal.com/sdk/js?client-id={{ paypal_client_id }}&currency=USD&intent=capture&components=buttons" data-namespace="paypal"></script>
@@ -15,6 +16,8 @@
 </head>
 <body>
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <!-- Logo mark: a yellow khata page with ink outline and three ledger lines -->
+  <symbol id="logo" viewBox="0 0 64 64"><rect x="6" y="6" width="52" height="52" rx="14" fill="#FFD166" stroke="#161714" stroke-width="4"/><path d="M20 22h24M20 32h24M20 42h14" stroke="#161714" stroke-width="4" stroke-linecap="round"/><circle cx="46" cy="44" r="7" fill="#06D6A0" stroke="#161714" stroke-width="3.5"/></symbol>
   <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a2 2 0 0 1-2 2h-4v-7H9v7H5a2 2 0 0 1-2-2z"/></symbol>
   <symbol id="i-bill" viewBox="0 0 24 24"><path d="M6 2h12v20l-3-2-3 2-3-2-3 2z"/><path d="M9 8h6M9 12h6M9 16h4"/></symbol>
   <symbol id="i-khata" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><path d="M9 7h7M9 11h5"/></symbol>
@@ -30,7 +33,7 @@
 <div class="app">
   <aside class="side">
     <a class="brand" href="#" onclick="goTab('home');return false;">
-      <span class="logo"><svg><use href="#i-bill"/></svg></span>
+      <span class="logo"><svg><use href="#logo"/></svg></span>
       <span><span class="brand-name">Dukaan Saathi</span><small>दुकान साथी · Shop assistant</small></span>
     </a>
     <div class="nav-label">Menu</div>
@@ -56,7 +59,7 @@
     <header class="top">
       <div class="top-row">
         <div>
-          <div class="brand-m">Dukaan Saathi</div>
+          <div class="brand-m"><span class="logo"><svg><use href="#logo"/></svg></span> Dukaan Saathi</div>
           <div class="shop">{{ shop_name }}</div>
           <div class="small muted" id="topDate"></div>
         </div>
@@ -78,18 +81,19 @@
         <div class="welcome">
           <div class="welcome-text">
             <div class="eyebrow">Welcome to the</div>
-            <h1>Dukaan Saathi dashboard</h1>
+            <h1>Dukaan Saathi <span class="marker">dashboard</span></h1>
             <p>Your AI shop assistant with PayPal built in. Bill by voice, keep the khata, let the collections agent recover udhaar, reorder stock, and see how the shop is really doing.</p>
             <div class="row gap wrap">
               <button class="btn primary lg" onclick="goTab('bill')"><svg class="bi"><use href="#i-mic"/></svg> Start billing</button>
-              <button class="btn gold lg" onclick="goTab('collect')"><svg class="bi"><use href="#i-collect"/></svg> Run collections agent</button>
+              <button class="btn dark lg" onclick="goTab('collect')"><svg class="bi"><use href="#i-collect"/></svg> Run collections agent</button>
             </div>
           </div>
           <div class="welcome-art" aria-hidden="true">
             <div class="orb"></div>
-            <div class="float-card c1"><span class="dotg"></span> Invoice paid · ₹4,126</div>
+            <div class="float-card c1"><span class="dotg"></span>Invoice paid · ₹4,126</div>
             <div class="float-card c2">"2 kilo cheeni, udhaar" → bill in 1.8 s</div>
             <div class="float-card c3">Reorder approved · PayPal</div>
+            <div class="float-note">no more paper khata ↗</div>
           </div>
         </div>
 
@@ -153,7 +157,7 @@
       <section class="tab" id="tab-khata">
         <div class="cols">
           <div class="card">
-            <div class="row between wrap gap"><h3>Khata (udhaar ledger)</h3><button class="btn sm navy" onclick="goTab('collect')">Collections agent</button></div>
+            <div class="row between wrap gap"><h3>Khata (udhaar ledger)</h3><button class="btn sm dark" onclick="goTab('collect')">Collections agent</button></div>
             <input id="custSearch" class="input" placeholder="Search customer…">
             <div id="custList" class="list list-only"></div>
             <div id="custGrid" class="grid grid-only" style="margin-top:10px;height:420px"></div>
@@ -176,7 +180,7 @@
               </div>
               <div class="row gap wrap" style="margin-top:14px">
                 <button id="collectRun" class="btn primary">Run collections agent</button>
-                <button id="collectAll" class="btn gold hidden">Approve all & send</button>
+                <button id="collectAll" class="btn dark hidden">Approve all & send</button>
                 <span id="collectSummary" class="small muted"></span>
               </div>
             </div>

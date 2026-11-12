@@ -110,6 +110,6 @@ vasooli.py      Collections agent: FIFO overdue analysis, policy, templates, AI-
 paypal.py       PayPal REST: OAuth, Invoicing v2 (send/remind/payments), Orders v2 (create/capture)
 db.py           SQLite schema + seed data
 templates/      index.html (single page, phone + desktop layouts)
-static/         app.js (UI), grid.js (AG Grid), style.css (PayPal-inspired theme)
+static/         app.js (UI), grid.js (AG Grid), style.css (paper-and-ink design system: Sora, hard shadows)
 DEMO_SCRIPT.md  3-minute video script · DEVPOST.md submission text · TEAM_PLAN.md
 ```

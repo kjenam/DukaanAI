@@ -1,0 +1,33 @@
+services:
+  - type: web
+    name: dukaan-saathi
+    runtime: python
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn app:app --workers 1 --threads 4 --timeout 120 --bind 0.0.0.0:$PORT
+    healthCheckPath: /healthz
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.7
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-3.6-flash,gemini-3.5-flash-lite,gemini-flash-latest
+      - key: GEMINI_FAST_MODEL
+        value: gemini-3.5-flash-lite,gemini-3.1-flash-lite,gemini-flash-lite-latest
+      - key: PAYPAL_CLIENT_ID
+        sync: false
+      - key: PAYPAL_CLIENT_SECRET
+        sync: false
+      - key: PAYPAL_ENV
+        value: sandbox
+      - key: PAYPAL_DEMO_BUYER_EMAIL
+        sync: false
+      - key: SUPPLIER_PAYPAL_EMAIL
+        sync: false
+      - key: SHOP_NAME
+        value: Prajapat Kirana Store
+      - key: SHOP_TZ
+        value: Asia/Kolkata
+      - key: INR_PER_USD
+        value: "88"

@@ -77,7 +77,7 @@ Optional: `render.yaml` deploys the same app on Render's free tier (Blueprint) i
 
 ## For judges: test it in 4 minutes
 
-With the three keys above in `.env` (the Devpost testing instructions also include a ready-made US sandbox buyer login).
+With the three keys above in `.env` (step 3 above covers creating the US sandbox buyer login you need to pay invoices).
 
 1. **Bill by voice or text** (Bill tab): click the chip *"Sharma ji 2 kilo cheeni, 1 Fortune tel, udhaar"* → preview in ~2 s
    (shows which model understood it and how fast) → **Save bill**. Udhaar outstanding goes up.

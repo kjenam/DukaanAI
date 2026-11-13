@@ -9,7 +9,7 @@ decides who to nudge for udhaar, writes a polite message, and uses **PayPal Invo
 low, a **reorder agent** drafts supplier orders that the owner pays with **PayPal Orders**. The owner approves every
 rupee that moves.
 
-> Demo video: `<youtube link>` · Devpost: `<link>` · **Run it locally in 5 minutes** (below). There is no hosted
+> [Demo video](https://www.youtube.com/watch?v=myfhoT8Xy8s) · [Devpost](https://devpost.com/software/dukaan-saathi-1im5fv) · **Run it locally in 5 minutes** (below). There is no hosted
 > instance; the app runs on your machine against the free PayPal sandbox and a free Gemini key.
 > **It also starts with no keys at all**: billing uses the built-in offline parser, the collections agent uses its
 > rule planner, and PayPal buttons show a "add keys" note, so you can explore the whole UI immediately.

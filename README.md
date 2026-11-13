@@ -111,5 +111,4 @@ paypal.py       PayPal REST: OAuth, Invoicing v2 (send/remind/payments), Orders 
 db.py           SQLite schema + seed data
 templates/      index.html (single page, phone + desktop layouts)
 static/         app.js (UI), grid.js (AG Grid), style.css (paper-and-ink design system: Sora, hard shadows)
-DEMO_SCRIPT.md  3-minute video script · DEVPOST.md submission text · TEAM_PLAN.md
 ```
